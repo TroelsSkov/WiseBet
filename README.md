@@ -1,5 +1,15 @@
 # React + TypeScript + Vite
 
+## Running with Docker
+
+The application runs on port 3000, so it's important to map it correctly.
+
+```bash
+$ docker build . -t "wisebet-frontend:latest" 
+$ docker run -p 3000:3000 wisebet-frontend:latest
+````
+
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
