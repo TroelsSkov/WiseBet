@@ -1,5 +1,5 @@
-import { formatNumber } from "../utils/formatNumber";
-import wisebetLogo from "../assets/wisebet.png"
+import { formatNumber } from "../../utils/formatNumber";
+import wisebetLogo from "../../assets/wisebet.png"
 
 interface BalancePillProps {
     balance: number;

@@ -2,7 +2,9 @@ import './App.css'
 import { Route, Routes } from 'react-router-dom'
 import Home from './pages/Home'
 import Layout from './layouts/MainLayout'
-import Coinflip from './pages/Coinflip'
+import Coinflip from './pages/games/Coinflip'
+import Blackjack from './pages/games/Blackjack'
+import Roulette from './pages/games/Roulette'
 
 function App() {
   return (
@@ -10,7 +12,9 @@ function App() {
       <Routes>
         <Route path='/' element={<Layout />} >
           <Route path='/' element={<Home />} />
-          <Route path='/coinflip' element={<Coinflip />} />
+          <Route path='/games/coinflip/:slug' element={<Coinflip />} />
+          <Route path='/games/blackjack/:slug' element={<Blackjack />} />
+          <Route path='/games/roulette/:slug' element={<Roulette />} />
         </Route>
       </Routes>
     </>

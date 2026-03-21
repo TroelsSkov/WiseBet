@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom"
-import Navigation from "../components/Navigation"
-import Chat from "../components/Chat"
+import Navigation from "../components/navbar/Navigation"
+import Chat from "../components/chat/Chat"
 
 function MainLayout() {
     return (
@@ -9,7 +9,7 @@ function MainLayout() {
                 <Navigation />
             </header>
 
-            <main className="col-span-4 row-span-9 row-start-2">
+            <main className="col-span-4 row-span-9 row-start-2 p-4">
                 <Outlet />
             </main>
 
