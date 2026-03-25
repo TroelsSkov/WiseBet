@@ -1,0 +1,143 @@
+.panel {
+  background: #1c2340;
+  padding: 20px;
+  border-radius: 14px;
+  width: 260px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+
+/* INPUT */
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  background: #11172c;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.currency {
+  color: #9cffb0;
+  font-weight: bold;
+}
+
+.inputRow input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  outline: none;
+}
+
+.multiplier {
+  display: flex;
+  gap: 6px;
+}
+
+.multiplier button {
+  background: #2a3350;
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* CHOICE */
+
+.choiceRow {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.choiceBox {
+  flex: 1;
+  height: 100px;
+  background: #2a3350;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  font-weight: bold;
+  color: #d0d4ff;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+/* ACTIVE (grøn outline som i screenshot) */
+.choiceBox.active {
+  border: 2px solid #00ff88;
+  box-shadow: 0 0 10px rgba(0,255,136,0.3);
+}
+
+/* BUTTON */
+
+.betBtn {
+  width: 100%;
+  padding: 14px;
+  background: #00a83e;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.betBtn:hover {
+  background: #00c94a;
+}
+
+.choiceBox:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.25);
+}
+
+
+.betBtn:disabled {
+  background: #2f3a55;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.coin {
+  width: 250px;
+  height: 250px;
+  position: relative;
+  transform-style: preserve-3d; 
+  transition: transform 7s ease-out;
+}
+
+.side {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 80px;
+  font-weight: bold;
+
+  border-radius: 50%;
+
+  backface-visibility: hidden; /* 🔥 vigtigt */
+}
+
+.front{
+      background: radial-gradient(circle, #ffd700, #c89b00);
+  color: white;
+}
+
+.back {
+      background: radial-gradient(circle, #ffd700, #c89b00);
+  transform: rotateY(180deg); 
+}
