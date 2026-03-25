@@ -6,7 +6,7 @@ import './App.css'
 
 type BetData = {
   amount: number;
-  choice: "W" | "B";
+  choice: "plat" | "krone";
 };
 
 function App() {

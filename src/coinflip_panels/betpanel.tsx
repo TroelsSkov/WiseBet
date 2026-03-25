@@ -1,13 +1,13 @@
 import { useState } from "react";
 
 type Props = {
-  onBet: (data: { amount: number; choice: "W" | "B" }) => void;
+  onBet: (data: { amount: number; choice: "plat" | "krone" }) => void;
   disabled: boolean;
 };
 
 export default function BetPanel({ onBet, disabled }: Props) {
   const [amount, setAmount] = useState(1);
-  const [choice, setChoice] = useState<"W" | "B">("W");
+  const [choice, setChoice] = useState<"plat" | "krone">("plat");
 
   return (
     <div className="panel">
@@ -28,15 +28,15 @@ export default function BetPanel({ onBet, disabled }: Props) {
 
       <div className="choiceRow">
         <div
-          className={`choiceBox ${choice === "W" ? "active" : ""}`}
-          onClick={() => setChoice("W")}
+          className={`choiceBox ${choice === "plat" ? "active" : ""}`}
+          onClick={() => setChoice("plat")}
         >
           W
         </div>
 
         <div
-          className={`choiceBox ${choice === "B" ? "active" : ""}`}
-          onClick={() => setChoice("B")}
+          className={`choiceBox ${choice === "krone" ? "active" : ""}`}
+          onClick={() => setChoice("krone")}
         >
           B
         </div>
