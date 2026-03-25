@@ -5,82 +5,38 @@
   text-align: center;
 }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0b1220;
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-.container {
-  display: flex;
-  height: 100vh;
-  align-items: center;
-  justify-content: center;
-  gap: 80px;
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.panel {
-  background: #1a2238;
-  padding: 20px;
-  border-radius: 12px;
-  width: 220px;
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
 }
 
-.inputRow {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
+.card {
+  padding: 2em;
 }
 
-.inputRow input {
-  flex: 1;
-  padding: 8px;
-  border-radius: 6px;
-  border: none;
-}
-
-.choiceRow {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.choiceRow button {
-  flex: 1;
-  padding: 20px;
-  border-radius: 10px;
-  border: none;
-  background: #2a3350;
-  color: white;
-  cursor: pointer;
-}
-
-.choiceRow .active {
-  border: 2px solid #00ff88;
-}
-
-.betBtn {
-  width: 100%;
-  padding: 14px;
-  background: #00a83e;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* COIN */
-
-.coin {
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, #ffd700, #c89b00);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 80px;
-  color: #fff;
-  box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+.read-the-docs {
+  color: #888;
 }

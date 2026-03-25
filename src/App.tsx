@@ -1,35 +1,35 @@
 import { useState } from 'react'
-import BetPanel from './coinflip_panels/betpanel'
-import CoinPanel from './coinflip_panels/coinpanel'
-
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
 import './App.css'
 
-type BetData = {
-  amount: number;
-  choice: "plat" | "krone";
-};
-
 function App() {
-  const [betData, setBetData] = useState<BetData | null>(null);
-  const [shouldFlip, setShouldFlip] = useState(false);
+  const [count, setCount] = useState(0)
 
   return (
-    <div className='container'>
-      <BetPanel
-        onBet={(data) => {
-          setBetData(data);
-          setShouldFlip(true);
-        }}
-        disabled={shouldFlip}
-      />
-
-      <CoinPanel
-        betData={betData}
-        shouldFlip={shouldFlip}
-        onFlipped={() => setShouldFlip(false)}
-      />
-    </div>
-  );
+    <>
+      <div>
+        <a href="https://vite.dev" target="_blank">
+          <img src={viteLogo} className="logo" alt="Vite logo" />
+        </a>
+        <a href="https://react.dev" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
+      </div>
+      <h1>Vite + React</h1>
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </button>
+        <p>
+          Edit <code>src/App.tsx</code> and save to test HMR
+        </p>
+      </div>
+      <p className="read-the-docs">
+        Click on the Vite and React logos to learn more
+      </p>
+    </>
+  )
 }
 
-export default App;
+export default App
