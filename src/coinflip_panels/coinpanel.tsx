@@ -67,6 +67,7 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
 
     }, [shouldFlip, betData, flipping]);
 
+    
     return (
         <div className="coinContainer">
             <div
