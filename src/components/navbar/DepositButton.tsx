@@ -9,11 +9,13 @@ function DepositButton() {
     }
 
     return (
-        <Button variant="pill" color="green" onClick={handleClick}>
-            <FontAwesomeIcon icon={faPlusCircle} />
-            &nbsp;
-            <p>Indbetal</p>
-        </Button>
+        <span>
+            <Button variant="pill" color="green" onClick={handleClick}>
+                <FontAwesomeIcon icon={faPlusCircle} />
+                &nbsp;
+                <p>Indbetal</p>
+            </Button>
+        </span>
     )
 }
 

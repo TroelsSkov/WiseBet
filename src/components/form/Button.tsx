@@ -21,7 +21,7 @@ function Button({ variant = 'solid', color = 'default', onClick, children }: But
     }
 
     return (
-        <button className={`flex items-center pointer ${variantStyles[variant]} ${colorStyles[color]}`} onClick={onClick}>
+        <button className={`flex h-full w-full items-center pointer ${variantStyles[variant]} ${colorStyles[color]}`} onClick={onClick}>
             {children}
         </button>
     )
