@@ -12,12 +12,13 @@ type Props = {
 };
 
 const playRound = async (amount: number, choice: "W" | "C") => {
-    const res = await fetch("http://localhost:3001/api/play-round", {
+    const choiceMapped = choice === "W" ? 0 : 1;
+    const res = await fetch("http://localhost:3001/api/playround", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ amount, choice }),
+        body: JSON.stringify({ amount, choice: choiceMapped }),
     });
 
     return await res.json();
@@ -36,25 +37,25 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
             setFlipping(true);
 
             try {
-                const { result, winnings } = await playRound(
+                const { result, win, winnings } = await playRound(
                     betData.amount,
                     betData.choice
                 );
 
-                const spins = 17;
-                const final = result === "W" ? 0 : 180; //front (W)=0, back (B)=180
+                const resultMapped: "W" | "C" = result === 0 ? "W" : "C";
 
                 // setRotation((prev) => prev + spins * 360 + final + 360);
                 setRotation((prev) => {
                     const normalized = prev % 360; // 0 eller 180
                     const spins = 17;
-                    const final = result === "W" ? 0 : 180;
+                    const final = resultMapped === "W" ? 0 : 180;
 
                     return prev + spins * 360 + (final - normalized);
                 });
 
-                console.log("Result:", result);
-                console.log("Win:", winnings);
+                console.log("Result:", resultMapped);
+                console.log("Win:", win);
+                console.log("Winnings", winnings);
 
 
             } catch (err) {
@@ -63,7 +64,6 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
             }
         };
         run();
-
     }, [shouldFlip, betData, flipping]);
 
     

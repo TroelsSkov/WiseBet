@@ -5,13 +5,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.post("/api/play-round", (req, res) => {
-  const { amount, choice } = req.body;
+app.post("/api/playround", (req, res) => {
+  const { amount, choice } = req.body; // 0 eller 1
 
-  const result = Math.random() > 0.5 ? "W" : "C";
-  const winnings = result === choice;
+  const result = Math.random() > 0.5 ? 0 : 1;
+  const win = result === choice;
+  const winnings = win ? amount * 2 : 0;
 
-  res.json({ result, winnings });
+  res.json({ result, win, winnings });
 });
 
 app.listen(3001, () => {

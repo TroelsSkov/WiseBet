@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Input from "../../form/Input";
 
 type Props = {
   onBet: (data: { amount: number; choice: "W" | "C" }) => void;
@@ -16,7 +17,7 @@ export default function BetPanel({ onBet, disabled }: Props) {
       <div className="flex items-center bg-[#11172c] p-2.5 rounded-lg mb-5 gap-2.5">
         <span className="text-[#9cffb0] font-bold">$</span>
 
-        <input
+        {/* <input
           type="number"
           min="0"
           value={amount}
@@ -33,16 +34,32 @@ export default function BetPanel({ onBet, disabled }: Props) {
             setAmount(value);
           }}
           className="flex-1 bg-transparent text-white outline-none [appearance:textfield]"
-        />
+        /> */}
 
-        <div className="flex gap-1.5">
+        <Input 
+          type="number"
+          value={amount}
+          onChange={(e) => {
+            const value = e.target.value;
+
+            if (value === "") {
+              setAmount("");
+              return;
+            }
+
+            if (Number(value) < 0) return;
+
+            setAmount(value);
+          }} />
+
+        {/* BUTTONS */}
+        <div className="flex items-center ml-2 bg-[#0f1528] rounded-md p-1 gap-1">
           <button
             onClick={() => {
               const numeric = Number(amount) || 0;
-              const newValue = Math.max(0, numeric / 2);
-              setAmount(newValue.toString());
+              setAmount(Math.max(0, numeric / 2).toString());
             }}
-            className="bg-[#2a3350] text-white px-2.5 py-1.5 rounded cursor-pointer"
+            className="text-white text-xs px-2 py-1 rounded hover:bg-[#2a3350]"
           >
             ½
           </button>
@@ -50,10 +67,9 @@ export default function BetPanel({ onBet, disabled }: Props) {
           <button
             onClick={() => {
               const numeric = Number(amount) || 0;
-              const newValue = Math.max(0, numeric * 2);
-              setAmount(newValue.toString());
+              setAmount(Math.max(0, numeric * 2).toString());
             }}
-            className="bg-[#2a3350] text-white px-2.5 py-1.5 rounded cursor-pointer"
+            className="text-white text-xs px-2 py-1 rounded hover:bg-[#2a3350]"
           >
             2x
           </button>
