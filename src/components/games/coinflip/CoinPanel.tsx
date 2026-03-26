@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "./coinpanel.css";
+import "../../../coinpanel.css";
 
 type BetData = {
     amount: number;
