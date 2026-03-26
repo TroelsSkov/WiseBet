@@ -1,5 +1,5 @@
 type ButtonVariant = 'solid' | 'pill' | 'round'
-type ButtonColor = 'default' | 'green'
+type ButtonColor = 'default' | 'green' | 'indigo'
 
 interface ButtonProps {
     variant?: ButtonVariant;
@@ -18,6 +18,7 @@ function Button({ variant = 'solid', color = 'default', onClick, children }: But
     const colorStyles: Record<ButtonColor, string> = {
         default: 'bg-gray-800 text-white hover:bg-gray-900',
         green: 'bg-green-500 text-white hover:bg-green-600',
+        indigo: 'bg-indigo-500 text-white hover:bg-indigo-600',
     }
 
     return (
