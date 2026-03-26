@@ -20,6 +20,8 @@ body {
   margin-bottom: 20px;
 }
 
+
+
 .choiceRow button {
   flex: 1;
   padding: 20px;
@@ -58,4 +60,10 @@ body {
   font-size: 80px;
   color: #fff;
   box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

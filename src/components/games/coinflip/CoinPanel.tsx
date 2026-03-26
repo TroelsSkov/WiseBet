@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 type BetData = {
     amount: number;
-    choice: "W" | "B";
+    choice: "W" | "C";
 };
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
     onFlipped: () => void;
 };
 
-const playRound = async (amount: number, choice: "W" | "B") => {
+const playRound = async (amount: number, choice: "W" | "C") => {
     const res = await fetch("http://localhost:3001/api/play-round", {
         method: "POST",
         headers: {
@@ -70,7 +70,7 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
     return (
   <div className="flex justify-center items-center mt-10">
     <div
-      className="w-[250px] h-[250px] relative [transform-style:preserve-3d] transition-transform duration-[7000ms] ease-out"
+      className="w-[400px] h-[400px] relative [transform-style:preserve-3d] transition-transform duration-[7000ms] ease-out"
       style={{ transform: `rotateY(${rotation}deg)` }}
       onTransitionEnd={() => {
         setFlipping(false);
@@ -78,13 +78,13 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
       }}
     >
       {/* FRONT */}
-      <div className="absolute w-full h-full flex items-center justify-center text-[80px] font-bold rounded-full text-white [backface-visibility:hidden] bg-[radial-gradient(circle,#ffd700,#c89b00)]">
+      <div className="absolute w-full h-full flex items-center justify-center text-[250px] font-bold rounded-full text-gray-400 [backface-visibility:hidden] bg-[radial-gradient(circle,#ffd700,#c89b00)]">
         W
       </div>
 
       {/* BACK */}
-      <div className="absolute w-full h-full flex items-center justify-center text-[80px] font-bold rounded-full text-white [backface-visibility:hidden] bg-[radial-gradient(circle,#ffd700,#c89b00)] [transform:rotateY(180deg)]">
-        B
+      <div className="absolute w-full h-full flex items-center justify-center text-[250px] font-bold rounded-full text-gray-400 [backface-visibility:hidden] bg-[radial-gradient(circle,#ffd700,#c89b00)] [transform:rotateY(180deg)]">
+        C
       </div>
     </div>
   </div>

@@ -4,7 +4,7 @@ import Coin from "../../components/games/coinflip/coinpanel";
 
 type BetData = {
   amount: number;
-  choice: "W" | "B";
+  choice: "W" | "C";
 };
 
 function Coinflip() {
@@ -13,19 +13,24 @@ function Coinflip() {
 
   return (
     <>
+    <div className="flex justify-center items-center w-full h-screen scale-100">
+    <div className="flex items-center gap-10">
+
       <BetPanel
         onBet={(data) => {
           setBetData(data);
           setShouldFlip(true)
         }}
         disabled={shouldFlip}
-      />
+        />
 
-      <Coin
+      <Coin 
         betData={betData}
         shouldFlip={shouldFlip}
         onFlipped={() => setShouldFlip(false)}
-      />
+        />
+        </div>
+        </div>
     </>
   )
 }
