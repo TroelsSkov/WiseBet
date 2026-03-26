@@ -66,11 +66,11 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
         run();
     }, [shouldFlip, betData, flipping]);
 
-    
+
     return (
   <div className="flex justify-center items-center mt-10">
     <div
-      className="w-[400px] h-[400px] relative [transform-style:preserve-3d] transition-transform duration-[7000ms] ease-out"
+      className="w-[500px] h-[500px] relative [transform-style:preserve-3d] transition-transform duration-[7000ms] ease-out"
       style={{ transform: `rotateY(${rotation}deg)` }}
       onTransitionEnd={() => {
         setFlipping(false);

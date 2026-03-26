@@ -17,27 +17,9 @@ export default function BetPanel({ onBet, disabled }: Props) {
       <div className="flex items-center bg-[#11172c] p-2.5 rounded-lg mb-5 gap-2.5">
         <span className="text-[#9cffb0] font-bold">$</span>
 
-        {/* <input
-          type="number"
-          min="0"
-          value={amount}
-          onChange={(e) => {
-            const value = e.target.value;
-
-            if (value === "") {
-              setAmount("");
-              return;
-            }
-
-            if (Number(value) < 0) return;
-
-            setAmount(value);
-          }}
-          className="flex-1 bg-transparent text-white outline-none [appearance:textfield]"
-        /> */}
-
         <Input 
           type="number"
+          placeholder="Beløb"
           value={amount}
           onChange={(e) => {
             const value = e.target.value;
