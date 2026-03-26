@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "../../../coinpanel.css";
 
 type BetData = {
     amount: number;
@@ -69,18 +68,25 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
 
     
     return (
-        <div className="coinContainer">
-            <div
-                className="coin"
-                style={{ transform: `rotateY(${rotation}deg)` }}
-                onTransitionEnd={() => {
-                    setFlipping(false);
-                    onFlipped();
-                }}
-            >
-                <div className="side front">W</div>
-                <div className="side back">B</div>
-            </div>
-        </div>
+  <div className="flex justify-center items-center mt-10">
+    <div
+      className="w-[250px] h-[250px] relative [transform-style:preserve-3d] transition-transform duration-[7000ms] ease-out"
+      style={{ transform: `rotateY(${rotation}deg)` }}
+      onTransitionEnd={() => {
+        setFlipping(false);
+        onFlipped();
+      }}
+    >
+      {/* FRONT */}
+      <div className="absolute w-full h-full flex items-center justify-center text-[80px] font-bold rounded-full text-white [backface-visibility:hidden] bg-[radial-gradient(circle,#ffd700,#c89b00)]">
+        W
+      </div>
+
+      {/* BACK */}
+      <div className="absolute w-full h-full flex items-center justify-center text-[80px] font-bold rounded-full text-white [backface-visibility:hidden] bg-[radial-gradient(circle,#ffd700,#c89b00)] [transform:rotateY(180deg)]">
+        B
+      </div>
+    </div>
+  </div>
     );
 }
