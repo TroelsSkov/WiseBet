@@ -14,7 +14,7 @@ function Coinflip() {
   return (
     <>
     <div className="flex justify-center items-center w-full h-screen scale-100">
-    <div className="flex items-center gap-10">
+    <div className="flex items-center gap-20">
 
       <BetPanel
         onBet={(data) => {
