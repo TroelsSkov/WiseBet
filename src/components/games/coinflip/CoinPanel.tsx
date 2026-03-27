@@ -19,20 +19,21 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
   useEffect(() => {
     if (!shouldFlip || flipping || !betData) return;
 
-
-
     setFlipping(true);
 
     socket.emit("playround", {
       amount: betData.amount,
-      choice: betData.choice === "W" ? 0 : 1,
+      choice: betData.choice === "W" ? "plat" : "krone",
     });
 
   }, [shouldFlip, betData, flipping]);
-  useEffect(() => {
-    const handleResult = ({ result, win, winnings }: any) => {
 
-      const resultMapped: "W" | "C" = result === 0 ? "W" : "C";
+  useEffect(() => {
+    const handleResult = ({ result, winnings }: any) => {
+
+      const resultMapped: "W" | "C" = result === "plat" ? "W" : "C";
+
+      const win = betData?.choice === resultMapped;
 
       setRotation((prev) => {
         const normalized = prev % 360;
@@ -52,7 +53,7 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
     return () => {
       socket.off("round-result", handleResult);
     };
-  }, []);
+  }, [betData]);
 
   return (
     <div className="flex justify-center items-center mt-10">

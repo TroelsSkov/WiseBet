@@ -16,17 +16,22 @@ const io = new Server(httpServer, {
 });
 
 io.on("connection", (socket) => {
-  console.log("Client connected", socket.id);
+  const connectedAt = new Date();
+
+  console.log("Client connected:", socket.id, connectedAt);
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id, new Date());
+  });
 
   socket.on("playround", ({ amount, choice }) => {
-    const result = Math.random() > 0.5 ? 0 : 1;
+    const result = Math.random() > 0.5 ? "plat" : "krone";
 
-    const win = result === choice;
-    const winnings = win ? amount * 2 : 0;
+
+    const winnings = result === choice ? amount * 2 : 0;
 
     socket.emit("round-result", {
       result,
-      win,
       winnings,
     });
   });
