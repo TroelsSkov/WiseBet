@@ -1,6 +1,6 @@
 import { useState } from "react";
-import BetPanel from "../../components/games/coinflip/betpanel";
-import Coin from "../../components/games/coinflip/coinpanel";
+import BetPanel from "../../components/games/coinflip/BetPanel";
+import Coin from "../../components/games/coinflip/CoinPanel";
 
 type BetData = {
   amount: number;
