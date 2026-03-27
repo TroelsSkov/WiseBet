@@ -26,8 +26,6 @@ io.on("connection", (socket) => {
 
   socket.on("playround", ({ amount, choice }) => {
     const result = Math.random() > 0.5 ? "plat" : "krone";
-
-
     const winnings = result === choice ? amount * 2 : 0;
 
     socket.emit("round-result", {
