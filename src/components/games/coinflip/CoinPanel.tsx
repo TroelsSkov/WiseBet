@@ -15,7 +15,7 @@ type Props = {
 const userId = "00000000-0000-0000-0000-000000000001";
 
 type CoinFlipResult = {
-  landingSide: string;
+  landingSide: "Wise" | "Coin";
   winnings: number;
   message: string;
 };
