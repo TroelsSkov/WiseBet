@@ -24,20 +24,24 @@ type CoinFlipResult = {
 export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
   const [rotation, setRotation] = useState(0);
   const [flipping, setFlipping] = useState(false);
+  const [currentChoice, setCurrentChoice] = useState<"W" | "C" | null>(null);
 
     useEffect(() => {
+      if(connection.state === "Disconnected"){
     connection
       .start()
       .then(() => console.log("SignalR connected"))
       .catch(console.error);
+      }
   }, []);
 
   useEffect(() => {
     if (!shouldFlip || flipping || !betData) return;
 
     setFlipping(true);
+    setCurrentChoice(betData.choice);
 
-      connection.invoke(
+    connection.invoke(
     "PlayRound",
     userId,
     betData.amount,
@@ -50,7 +54,7 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
     const handleResult = (data: CoinFlipResult) => {
       const resultMapped: "W" | "C" = data.landingSide === "Wise" ? "W" : "C";
 
-      const win = betData?.choice === resultMapped;
+      const win = currentChoice === resultMapped;
 
       setRotation((prev) => {
         const normalized = prev % 360;
@@ -71,12 +75,13 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
     return () => {
       connection.off("UpdateClient", handleResult);
     };
-  }, [betData]);
+  }, [currentChoice]);
 
     useEffect(() => {
     const errorHandler = (msg: string) => {
       console.error("Server error:", msg);
       setFlipping(false);
+      setCurrentChoice(null);
     };
 
     connection.on("ErrorMessageToClient", errorHandler);
@@ -93,6 +98,7 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
         style={{ transform: `rotateY(${rotation}deg)` }}
         onTransitionEnd={() => {
           setFlipping(false);
+          setCurrentChoice(null);
           onFlipped();
         }}
       >
