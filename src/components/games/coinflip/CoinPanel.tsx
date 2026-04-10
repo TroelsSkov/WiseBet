@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { socket } from "./socket";
+import { connection } from "./signalr";
 
 type BetData = {
   amount: number;
@@ -12,26 +12,43 @@ type Props = {
   onFlipped: () => void;
 };
 
+const userId = "00000000-0000-0000-0000-000000000001";
+
+type CoinFlipResult = {
+  landingSide: string;
+  winnings: number;
+  message: string;
+};
+
+
 export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
   const [rotation, setRotation] = useState(0);
   const [flipping, setFlipping] = useState(false);
+
+    useEffect(() => {
+    connection
+      .start()
+      .then(() => console.log("SignalR connected"))
+      .catch(console.error);
+  }, []);
 
   useEffect(() => {
     if (!shouldFlip || flipping || !betData) return;
 
     setFlipping(true);
 
-    socket.emit("playround", {
-      amount: betData.amount,
-      choice: betData.choice === "W" ? "plat" : "krone",
-    });
+      connection.invoke(
+    "PlayRound",
+    userId,
+    betData.amount,
+    betData.choice === "W" ? "Wise" : "Coin"
+   );
 
   }, [shouldFlip, betData, flipping]);
 
   useEffect(() => {
-    const handleResult = ({ result, winnings }: any) => {
-
-      const resultMapped: "W" | "C" = result === "plat" ? "W" : "C";
+    const handleResult = (data: CoinFlipResult) => {
+      const resultMapped: "W" | "C" = data.landingSide === "Wise" ? "W" : "C";
 
       const win = betData?.choice === resultMapped;
 
@@ -45,15 +62,29 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
 
       console.log("Result:", resultMapped);
       console.log("Win:", win);
-      console.log("Winnings:", winnings);
+      console.log("Winnings:", data.winnings);
+      console.log("Message", data.message);
     };
 
-    socket.on("round-result", handleResult);
+    connection.on("UpdateClient", handleResult);
 
     return () => {
-      socket.off("round-result", handleResult);
+      connection.off("UpdateClient", handleResult);
     };
   }, [betData]);
+
+    useEffect(() => {
+    const errorHandler = (msg: string) => {
+      console.error("Server error:", msg);
+      setFlipping(false);
+    };
+
+    connection.on("ErrorMessageToClient", errorHandler);
+
+    return () => {
+      connection.off("ErrorMessageToClient", errorHandler);
+    };
+  }, []);
 
   return (
     <div className="flex justify-center items-center mt-10">
