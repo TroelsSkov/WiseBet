@@ -3,6 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { Route, Routes } from 'react-router-dom'
+import { UserContext } from './context/UserContext'
 import Home from './pages/Home'
 import Layout from './layouts/MainLayout'
 import Coinflip from './pages/games/Coinflip'
@@ -12,6 +13,7 @@ import Roulette from './pages/games/Roulette'
 function App() {
   return (
     <>
+    <UserContext.Provider value={{ id: "ced1dba6-c044-48cf-a808-0738185ab394" }}> /*hardcoded for now*/
       <Routes>
         <Route path='/' element={<Layout />} >
           <Route path='/' element={<Home />} />
@@ -20,6 +22,7 @@ function App() {
           <Route path='/games/roulette/:slug' element={<Roulette />} />
         </Route>
       </Routes>
+    </UserContext.Provider>
     </>
   )
 }

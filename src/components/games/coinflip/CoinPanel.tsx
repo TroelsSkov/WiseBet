@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { connection } from "./signalr";
+import { useUser } from "../../../context/UserContext";
+
 
 type BetData = {
   amount: number;
-  choice: "W" | "C";
+  choice: "W" | "C"; //limits choices to take
 };
 
 type Props = {
@@ -12,7 +14,8 @@ type Props = {
   onFlipped: () => void;
 };
 
-const userId = "00000000-0000-0000-0000-000000000001"; //temporary. fake userId
+
+// const userId = "00000000-0000-0000-0000-000000000001"; //temporary. fake userId
 
 type CoinFlipResult = {
   landingSide: "Wise" | "Coin";
@@ -25,9 +28,11 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
   const [rotation, setRotation] = useState(0);
   const [flipping, setFlipping] = useState(false);
   const [currentChoice, setCurrentChoice] = useState<"W" | "C" | null>(null);
+  const user = useUser();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   /**
-   * useeffect will start at first render of the screen
+   * useeffect will start at first render of the screen. it triggers automatically instead of needing to keep an eye on it ourselves.
    */
     useEffect(() => {
       if(connection.state === "Disconnected"){
@@ -42,25 +47,28 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
  * this useeffect is triggered when either, shouldFlip, betData or flipping has a changed state
  */
   useEffect(() => {
-    if (!shouldFlip || flipping || !betData) return; //if not all states is changed the useeffect will just return
+    if (!shouldFlip || flipping || !betData || !user) return; //if not all states is changed the useeffect will just return
 
     setFlipping(true); //locking the flip, so the coin only flips once
     setCurrentChoice(betData.choice);
 
     connection.invoke( //invoke sends message to the server
     "PlayRound",
-    userId,
+    user.id,
     betData.amount,
     betData.choice === "W" ? "Wise" : "Coin"
    );
+   timeoutRef.current = setTimeout(() => { onFlipped(); setFlipping(false); setCurrentChoice(null); }, 8000);
 
-  }, [shouldFlip, betData, flipping]);
+  }, [shouldFlip, betData, flipping, user]); //dependencies in the current useeffect
 
   /**
    * is triggered by currentChoice element
    */
   useEffect(() => {
     const handleResult = (data: CoinFlipResult) => {
+      if(timeoutRef.current){
+      clearTimeout(timeoutRef.current);}
       const resultMapped: "W" | "C" = data.landingSide === "Wise" ? "W" : "C";
 
       const win = currentChoice === resultMapped;
@@ -73,7 +81,10 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
         return prev + spins * 360 + (final - normalized);
       });
 
-      console.log("Result:", resultMapped);
+      /**
+       * shows what is logged in the web console
+       */
+      console.log("Result:", resultMapped); 
       console.log("Win:", win);
       console.log("Winnings:", data.winnings);
       console.log("Message", data.message);
@@ -84,7 +95,7 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
     return () => {
       connection.off("UpdateClient", handleResult); //stops listening on UpdateClient from the backend
     };
-  }, [currentChoice]);
+  }, [currentChoice]); //dependency for triggering useeffect
 
 
   /**
