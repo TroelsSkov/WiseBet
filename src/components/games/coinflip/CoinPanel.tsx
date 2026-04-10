@@ -42,12 +42,12 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
  * this useeffect is triggered when either, shouldFlip, betData or flipping has a changed state
  */
   useEffect(() => {
-    if (!shouldFlip || flipping || !betData) return;
+    if (!shouldFlip || flipping || !betData) return; //if not all states is changed the useeffect will just return
 
-    setFlipping(true);
+    setFlipping(true); //locking the flip, so the coin only flips once
     setCurrentChoice(betData.choice);
 
-    connection.invoke(
+    connection.invoke( //invoke sends message to the server
     "PlayRound",
     userId,
     betData.amount,
@@ -79,10 +79,10 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
       console.log("Message", data.message);
     };
 
-    connection.on("UpdateClient", handleResult);
+    connection.on("UpdateClient", handleResult); //listens on UpdateClient from backend
 
     return () => {
-      connection.off("UpdateClient", handleResult);
+      connection.off("UpdateClient", handleResult); //stops listening on UpdateClient from the backend
     };
   }, [currentChoice]);
 
@@ -97,10 +97,10 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
       setCurrentChoice(null);
     };
 
-    connection.on("ErrorMessageToClient", errorHandler);
+    connection.on("ErrorMessageToClient", errorHandler); //listen ErrorMessageToClient
 
     return () => {
-      connection.off("ErrorMessageToClient", errorHandler);
+      connection.off("ErrorMessageToClient", errorHandler); //stops to lisen on errormessageClient
     };
   }, []);
 
