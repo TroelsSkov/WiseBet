@@ -41,6 +41,27 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
     setFlipping(true);
     setCurrentChoice(betData.choice);
 
+
+    /**
+     * Simulerer coinflip til frontenden. slettes når backend er klar til implementering
+     */
+      if (true) {
+    console.log("TEST MODE");
+
+    setTimeout(() => {
+      const fakeResult = Math.random() > 0.5 ? "Wise" : "Coin";
+
+      const resultMapped = fakeResult === "Wise" ? "W" : "C";
+      const win = betData.choice === resultMapped;
+
+      console.log("Simulated result:", fakeResult);
+      console.log("Win:", win);
+      console.log("Winnings:", win ? betData.amount * 2 : 0);
+    }, 500);
+
+    return; 
+  }
+
     connection.invoke(
     "PlayRound",
     userId,
