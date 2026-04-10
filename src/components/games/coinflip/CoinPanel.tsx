@@ -51,13 +51,15 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
 
     setFlipping(true); //locking the flip, so the coin only flips once
     setCurrentChoice(betData.choice);
-
-    connection.invoke( //invoke sends message to the server
+    console.log("bet placed");
+    connection.invoke("test", "din mor");
+    connection.invoke( //send sends message to the server
     "PlayRound",
     user.id,
     betData.amount,
     betData.choice === "W" ? "Wise" : "Coin"
    );
+
    timeoutRef.current = setTimeout(() => { onFlipped(); setFlipping(false); setCurrentChoice(null); }, 8000);
 
   }, [shouldFlip, betData, flipping, user]); //dependencies in the current useeffect
