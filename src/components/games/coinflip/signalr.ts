@@ -4,11 +4,10 @@
 //     transports: ["websocket"]
 // });
 
-
 import * as signalR from "@microsoft/signalr";
 
 export const connection = new signalR.HubConnectionBuilder()
-  .withUrl("http://localhost:5000/gamehub")
+  .withUrl("http://localhost:3000/gamehub")
   .withAutomaticReconnect()
   .build();
 

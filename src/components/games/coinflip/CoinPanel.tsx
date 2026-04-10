@@ -12,7 +12,7 @@ type Props = {
   onFlipped: () => void;
 };
 
-const userId = "00000000-0000-0000-0000-000000000001";
+const userId = "00000000-0000-0000-0000-000000000001"; //temporary. fake userId
 
 type CoinFlipResult = {
   landingSide: "Wise" | "Coin";
@@ -26,6 +26,9 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
   const [flipping, setFlipping] = useState(false);
   const [currentChoice, setCurrentChoice] = useState<"W" | "C" | null>(null);
 
+  /**
+   * useeffect will start at first render of the screen
+   */
     useEffect(() => {
       if(connection.state === "Disconnected"){
     connection
@@ -35,32 +38,14 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
       }
   }, []);
 
+/**
+ * this useeffect is triggered when either, shouldFlip, betData or flipping has a changed state
+ */
   useEffect(() => {
     if (!shouldFlip || flipping || !betData) return;
 
     setFlipping(true);
     setCurrentChoice(betData.choice);
-
-
-    /**
-     * Simulerer coinflip til frontenden. slettes når backend er klar til implementering
-     */
-      if (true) {
-    console.log("TEST MODE");
-
-    setTimeout(() => {
-      const fakeResult = Math.random() > 0.5 ? "Wise" : "Coin";
-
-      const resultMapped = fakeResult === "Wise" ? "W" : "C";
-      const win = betData.choice === resultMapped;
-
-      console.log("Simulated result:", fakeResult);
-      console.log("Win:", win);
-      console.log("Winnings:", win ? betData.amount * 2 : 0);
-    }, 500);
-
-    return; 
-  }
 
     connection.invoke(
     "PlayRound",
@@ -71,6 +56,9 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
 
   }, [shouldFlip, betData, flipping]);
 
+  /**
+   * is triggered by currentChoice element
+   */
   useEffect(() => {
     const handleResult = (data: CoinFlipResult) => {
       const resultMapped: "W" | "C" = data.landingSide === "Wise" ? "W" : "C";
@@ -98,6 +86,10 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
     };
   }, [currentChoice]);
 
+
+  /**
+   * triggered by first render
+   */
     useEffect(() => {
     const errorHandler = (msg: string) => {
       console.error("Server error:", msg);
