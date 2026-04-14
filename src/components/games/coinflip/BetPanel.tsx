@@ -1,14 +1,15 @@
 import { useState } from "react";
 import Input from "../../form/Input";
+import { type CoinflipGameRequest, CoinflipSide } from "../../../types/games/coinflip.d.ts";
 
 type Props = {
-  onBet: (data: { amount: number; choice: "W" | "C" }) => void;
+  onBet: (data: CoinflipGameRequest) => void;
   disabled: boolean;
 };
 
 export default function BetPanel({ onBet, disabled }: Props) {
   const [amount, setAmount] = useState("");
-  const [choice, setChoice] = useState<"W" | "C">("W");
+  const [choice, setChoice] = useState<CoinflipSide>(CoinflipSide.Wise);
 
   return (
     <div className="bg-[#1c2340] p-5 rounded-xl w-[260px] shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
@@ -61,10 +62,10 @@ export default function BetPanel({ onBet, disabled }: Props) {
       {/* CHOICE */}
       <div className="flex gap-4 mb-5">
         <div
-          onClick={() => !disabled && setChoice("W")}
+          onClick={() => !disabled && setChoice(CoinflipSide.Wise)}
           className={`flex-1 h-[100px] bg-[#2a3350] rounded-xl flex items-center justify-center text-[42px] font-bold text-[#d0d4ff] cursor-pointer border-2 transition-all duration-200
           ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-105 hover:shadow-[0_0_20px_rgba(0,255,136,0.25)]"}
-            ${choice === "W"
+            ${choice === CoinflipSide.Wise
               ? "border-[#00ff88] shadow-[0_0_10px_rgba(0,255,136,0.3)]"
               : "border-transparent"}
           hover:scale-105 hover:shadow-[0_0_20px_rgba(0,255,136,0.25)]`}
@@ -73,10 +74,10 @@ export default function BetPanel({ onBet, disabled }: Props) {
         </div>
 
         <div
-          onClick={() => !disabled && setChoice("C")}
+          onClick={() => !disabled && setChoice(CoinflipSide.Coin)}
           className={`flex-1 h-[100px] bg-[#2a3350] rounded-xl flex items-center justify-center text-[42px] font-bold text-[#d0d4ff] cursor-pointer border-2 transition-all duration-200
           ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-105 hover:shadow-[0_0_20px_rgba(0,255,136,0.25)]"}
-            ${choice === "C"
+            ${choice === CoinflipSide.Coin
               ? "border-[#00ff88] shadow-[0_0_10px_rgba(0,255,136,0.3)]"
               : "border-transparent"}
           hover:scale-105 hover:shadow-[0_0_20px_rgba(0,255,136,0.25)]`}

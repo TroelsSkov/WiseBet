@@ -1,15 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { connection } from "./signalr";
 import { useUser } from "../../../context/UserContext";
-
-
-type BetData = {
-  amount: number;
-  choice: "W" | "C"; //limits choices to take
-};
+import type { CoinflipGameRequest, CoinflipSide } from "../../../types/games/coinflip";
 
 type Props = {
-  betData: BetData | null;
+  betData: CoinflipGameRequest | null;
   shouldFlip: boolean;
   onFlipped: () => void;
 };
@@ -18,7 +13,7 @@ type Props = {
 // const userId = "00000000-0000-0000-0000-000000000001"; //temporary. fake userId
 
 type CoinFlipResult = {
-  landingSide: 0 | 1;
+  landingSide: CoinflipSide;
   winnings: number;
   message: string;
 };
@@ -27,7 +22,7 @@ type CoinFlipResult = {
 export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
   const [rotation, setRotation] = useState(0);
   const [flipping, setFlipping] = useState(false);
-  const [currentChoice, setCurrentChoice] = useState<"W" | "C" | null>(null);
+  const [currentChoice, setCurrentChoice] = useState<CoinflipSide | null>(null);
   const user = useUser();
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
@@ -55,7 +50,7 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
       "PlayRound",
       user.id,
       betData.amount,
-      betData.choice === "W" ? 0 : 1
+      betData.choice
     );
 
     timeoutRef.current = setTimeout(() => { onFlipped(); setFlipping(false); setCurrentChoice(null); }, 8000);
@@ -70,14 +65,13 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      const resultMapped: "W" | "C"= data.landingSide === 0 ? "W" : "C";
 
-      const win = currentChoice === resultMapped;
+      const win = currentChoice === data.landingSide;
 
       setRotation((prev) => {
         const normalized = prev % 360;
         const spins = 17;
-        const final = resultMapped === "W" ? 0 : 180;
+        const final = data.landingSide * 180;
 
         return prev + spins * 360 + (final - normalized);
       });
@@ -85,7 +79,7 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
       /**
        * shows what is logged in the web console
        */
-      console.log("Result:", resultMapped);
+      console.log("Result:", data.landingSide);
       console.log("Win:", win);
       console.log("Winnings:", data.winnings);
       console.log("Message", data.message);

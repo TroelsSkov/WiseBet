@@ -12,4 +12,3 @@ export const connection = new signalR.HubConnectionBuilder()
   .withUrl("http://172.20.10.3:5277/gamehub")
   .withAutomaticReconnect()
   .build();
-
