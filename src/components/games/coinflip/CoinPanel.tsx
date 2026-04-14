@@ -10,8 +10,6 @@ type Props = {
 };
 
 
-// const userId = "00000000-0000-0000-0000-000000000001"; //temporary. fake userId
-
 type CoinFlipResult = {
   landingSide: CoinflipSide;
   winnings: number;
