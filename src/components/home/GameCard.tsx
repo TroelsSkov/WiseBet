@@ -23,9 +23,11 @@ function GameCard({ name, game, image }: GameCardProps) {
             )}
             <div className="relative z-10 flex flex-col gap-2 p-4 items-center w-full">
                 <h3 className="text-lg font-bold">{name}</h3>
-                <Button onClick={handleGameCreation}>
-                    Spil nu
-                </Button>
+                <span>
+                    <Button onClick={handleGameCreation}>
+                        Spil nu
+                    </Button>
+                </span>
             </div>
         </div>
     );

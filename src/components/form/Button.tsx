@@ -1,5 +1,5 @@
 type ButtonVariant = 'solid' | 'pill' | 'round'
-type ButtonColor = 'default' | 'green'
+type ButtonColor = 'default' | 'green' | 'indigo'
 
 interface ButtonProps {
     variant?: ButtonVariant;
@@ -18,10 +18,11 @@ function Button({ variant = 'solid', color = 'default', onClick, children }: But
     const colorStyles: Record<ButtonColor, string> = {
         default: 'bg-gray-800 text-white hover:bg-gray-900',
         green: 'bg-green-500 text-white hover:bg-green-600',
+        indigo: 'bg-indigo-500 text-white hover:bg-indigo-600',
     }
 
     return (
-        <button className={`flex items-center pointer ${variantStyles[variant]} ${colorStyles[color]}`} onClick={onClick}>
+        <button className={`flex h-full w-full items-center pointer ${variantStyles[variant]} ${colorStyles[color]}`} onClick={onClick}>
             {children}
         </button>
     )

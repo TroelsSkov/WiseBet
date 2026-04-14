@@ -3,8 +3,6 @@ import Input from "../form/Input";
 import Message from "./Message";
 import { useEffect, useRef } from "react";
 
-
-
 function Chat() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
