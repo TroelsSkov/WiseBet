@@ -1,17 +1,44 @@
 import { useApi } from "../services/useApi";
 import { apiService } from "../services/apiService";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/form/Button";
 import Input from "../components/form/Input";
 import wisebetLogo from "../assets/wisebet.png"
+import { useState } from "react";
 
 function Signup() {
-    // Fetch current user (WIP)
-    const { data: user, loading, error, refetch } =
-        useApi<User>("/users/me");
+    const navigate = useNavigate();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [fullName, setFullName] = useState("");
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error: {error}</p>;
+    function handleSignup(e: React.SubmitEvent) {
+        e.preventDefault();
+
+        apiService.post("/Api/Users/Auth/Register", { userName: username, password: password, fullName: fullName })
+            .then(({ error }) => {
+                if (error) {
+                    console.error("Signup failed:", error);
+                    return;
+                }
+
+                // Login after account creation
+                handleLogin();
+            });
+    }
+
+    function handleLogin() {
+        apiService.post("/Api/Users/Auth/Login", { userName: username, password: password })
+            .then(({ error, data }) => {
+                if (error) {
+                    console.error("Login failed:", error);
+                    return;
+                }
+
+                console.log("Login successful:", data);
+                navigate("/");
+            });
+    }
 
     return (
         <>
@@ -22,11 +49,20 @@ function Signup() {
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                    <form action="#" method="POST" className="space-y-6">
+                    <form onSubmit={handleSignup} method="POST" className="space-y-6">
+                        <div>
+                            <div className="flex items-center justify-between">
+                                <label htmlFor="full-name" className="block text-sm/6 font-medium text-gray-100">Fulde navn</label>
+                            </div>
+                            <div className="mt-2">
+                                <Input onChange={e => setFullName(e.target.value)} id="full-name" type="text" name="full-name" required />
+                            </div>
+                        </div>
+
                         <div>
                             <label htmlFor="username" className="block text-sm/6 font-medium text-gray-100">Brugernavn</label>
                             <div className="mt-2">
-                                <Input id="username" type="text" name="username" required />
+                                <Input onChange={e => setUsername(e.target.value)} id="username" type="text" name="username" required />
                             </div>
                         </div>
 
@@ -35,19 +71,9 @@ function Signup() {
                                 <label htmlFor="password" className="block text-sm/6 font-medium text-gray-100">Adgangskode</label>
                             </div>
                             <div className="mt-2">
-                                <Input id="password" type="password" name="password" required  />
+                                <Input onChange={e => setPassword(e.target.value)} id="password" type="password" name="password" required  />
                             </div>
                         </div>
-
-                        <div>
-                            <div className="flex items-center justify-between">
-                                <label htmlFor="confirm-password" className="block text-sm/6 font-medium text-gray-100">Bekræft adgangskode</label>
-                            </div>
-                            <div className="mt-2">
-                                <Input id="confirm-password" type="password" name="confirm-password" required />
-                            </div>
-                        </div>
-
                         <div>
                             <Button color="indigo">Opret konto</Button>
                         </div>
