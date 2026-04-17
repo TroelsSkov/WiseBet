@@ -1,15 +1,16 @@
-enum CoinflipOutcome {
+import type { GameRequest, GameResponse } from "./game";
+
+enum CoinflipSide {
     Wise,
     Coin
 }
 
-interface CoinflipGameResponse {
-    id: number;
-    outcome: CoinflipOutcome;
+interface CoinflipGameResponse extends GameResponse {
+    landingSide: CoinflipSide;
 }
 
-interface CoinflipGameRequest {
-    id: number;
-    bet: number;
-    outcome: CoinflipOutcome;
+interface CoinflipGameRequest extends GameRequest {
+    choice: CoinflipSide;
 }
+
+export { CoinflipGameRequest, CoinflipGameResponse, CoinflipSide };
