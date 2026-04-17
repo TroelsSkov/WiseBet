@@ -1,4 +1,3 @@
-import { useApi } from "../services/useApi";
 import { apiService } from "../services/apiService";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/form/Button";
@@ -71,7 +70,7 @@ function Signup() {
                                 <label htmlFor="password" className="block text-sm/6 font-medium text-gray-100">Adgangskode</label>
                             </div>
                             <div className="mt-2">
-                                <Input onChange={e => setPassword(e.target.value)} id="password" type="password" name="password" required  />
+                                <Input onChange={e => setPassword(e.target.value)} id="password" type="password" name="password" required />
                             </div>
                         </div>
                         <div>

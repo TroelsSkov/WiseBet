@@ -1,4 +1,3 @@
-import { useApi } from "../services/useApi";
 import { apiService } from "../services/apiService";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -38,7 +37,7 @@ function Login() {
                         <div>
                             <label htmlFor="username" className="block text-sm/6 font-medium text-gray-100">Brugernavn</label>
                             <div className="mt-2">
-                                <Input onChange={e => {setUsername(e.target.value)}} id="username" type="text" name="username" required />
+                                <Input onChange={e => { setUsername(e.target.value) }} id="username" type="text" name="username" required />
                             </div>
                         </div>
 
@@ -50,7 +49,7 @@ function Login() {
                                 </div>
                             </div>
                             <div className="mt-2">
-                                <Input onChange={e => {setPassword(e.target.value)}} id="password" type="password" name="password" required  />
+                                <Input onChange={e => { setPassword(e.target.value) }} id="password" type="password" name="password" required />
                             </div>
                         </div>
 
