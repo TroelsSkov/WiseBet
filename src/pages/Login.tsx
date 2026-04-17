@@ -1,15 +1,27 @@
-import { useApi } from "../services/useApi";
 import { apiService } from "../services/apiService";
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import Input from "../components/form/Input";
 import Button from "../components/form/Button";
 import wisebetLogo from "../assets/wisebet.png"
 
 function Login() {
     const navigate = useNavigate();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
 
-    function handleLogin() {
-        navigate("/");
+    function handleLogin(e: React.SubmitEvent) {
+        e.preventDefault();
+
+        apiService.post("/Api/Users/Auth/Login", { userName: username, password: password })
+            .then(({ error }) => {
+                if (error) {
+                    console.error("Login failed:", error);
+                    return;
+                }
+
+                navigate("/");
+            });
     }
 
     return (
@@ -21,11 +33,11 @@ function Login() {
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                    <form action="#" method="POST" className="space-y-6">
+                    <form onSubmit={handleLogin} className="space-y-6">
                         <div>
                             <label htmlFor="username" className="block text-sm/6 font-medium text-gray-100">Brugernavn</label>
                             <div className="mt-2">
-                                <Input id="username" type="text" name="username" required />
+                                <Input onChange={e => { setUsername(e.target.value) }} id="username" type="text" name="username" required />
                             </div>
                         </div>
 
@@ -37,7 +49,7 @@ function Login() {
                                 </div>
                             </div>
                             <div className="mt-2">
-                                <Input id="password" type="password" name="password" required  />
+                                <Input onChange={e => { setPassword(e.target.value) }} id="password" type="password" name="password" required />
                             </div>
                         </div>
 

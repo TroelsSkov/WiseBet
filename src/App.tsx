@@ -2,8 +2,7 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { Route, Routes } from 'react-router-dom'
-import { UserContext } from './context/UserContext'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Layout from './layouts/MainLayout'
@@ -11,11 +10,26 @@ import Coinflip from './pages/games/Coinflip'
 import Blackjack from './pages/games/Blackjack'
 import Roulette from './pages/games/Roulette'
 import Signup from './pages/Signup'
+import { useEffect } from 'react'
+import { useApi } from './services/useApi'
 
 function App() {
+  const location = useLocation();
+  const excludedPaths = ["/login", "/signup"];
+  const { error } = useApi<void>("/Api/Users/Auth");
+
+  useEffect(() => {
+    if (excludedPaths.includes(location.pathname)) {
+      return;
+    }
+
+    if (error) {
+      console.error("Session check failed:", error);
+    }
+  }, [location.pathname]);
+
   return (
     <>
-    <UserContext.Provider value={{ id: "ced1dba6-c044-48cf-a808-0738185ab394" }}> /*hardcoded for now*/
       <Routes>
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
@@ -26,7 +40,6 @@ function App() {
           <Route path='/games/roulette/:slug' element={<Roulette />} />
         </Route>
       </Routes>
-    </UserContext.Provider>
     </>
   )
 }

@@ -1,24 +1,19 @@
 import { ApiResponse, RequestOptions } from "../types/api";
 
-const BASE_URL = "https://api.example.com";
-
 async function request<T>(
   method: string,
   path: string,
   body?: unknown,
   options?: RequestOptions
 ): Promise<ApiResponse<T>> {
-  const token = localStorage.getItem("token");
-
-  const res = await fetch(`${BASE_URL}${path}`, {
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}${path}`, {
     method,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
       ...options?.headers,
     },
     body: body ? JSON.stringify(body) : undefined,
-    signal: options?.signal,
   });
 
   if (!res.ok) {
@@ -26,7 +21,11 @@ async function request<T>(
     return { data: null, error: message, status: res.status };
   }
 
-  const data: T = await res.json();
+  const contentType = res.headers.get("Content-Type") ?? "";
+  const data: T = contentType.includes("application/json")
+    ? await res.json()
+    : (await res.text()) as T;
+
   return { data, error: null, status: res.status };
 }
 

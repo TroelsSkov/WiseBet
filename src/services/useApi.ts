@@ -22,10 +22,13 @@ export function useApi<T>(path: string): UseApiState<T> {
         setError(null);
 
         apiService
-            .get<T>(path, { signal: controller.signal })
+            .get<T>(path)
             .then(({ data, error }) => {
-                if (error) setError(error);
-                else setData(data);
+                if (error) {
+                    setError(error);
+                } else {
+                    setData(data);
+                }
             })
             .finally(() => setLoading(false));
 

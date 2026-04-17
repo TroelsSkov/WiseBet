@@ -1,6 +1,5 @@
 interface RequestOptions {
   headers?: Record<string, string>;
-  signal?: AbortSignal;
 }
 
 interface ApiResponse<T> {
