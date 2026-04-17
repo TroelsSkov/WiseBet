@@ -40,20 +40,22 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
    * this useeffect is triggered when either, shouldFlip, betData or flipping has a changed state
    */
   useEffect(() => {
-    if (!shouldFlip || flipping || !betData || !user) return; //if not all states is changed the useeffect will just return
+    console.log("Måske?");
+    if (!shouldFlip || flipping || !betData) return; //if not all states is changed the useeffect will just return
 
     setFlipping(true); //locking the flip, so the coin only flips once
     setCurrentChoice(betData.choice);
     connection.invoke( //send sends message to the server
       "PlayRound",
-      user.id,
+      "435cdfcd-9cb4-4e1e-8f34-d3e8a71f29bc", //temp userId
       betData.amount,
       betData.choice
     );
-
+    console.log("Yay!");
+    
     timeoutRef.current = setTimeout(() => { onFlipped(); setFlipping(false); setCurrentChoice(null); }, 8000);
 
-  }, [shouldFlip]); //dependencies in the current useeffect
+  }, [shouldFlip, betData,flipping]); //dependencies in the current useeffect
 
   /**
    * is triggered by currentChoice element
