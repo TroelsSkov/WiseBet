@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
@@ -12,8 +9,10 @@ import Roulette from './pages/games/Roulette'
 import Signup from './pages/Signup'
 import { useEffect } from 'react'
 import { useApi } from './services/useApi'
+import { toast } from 'react-toastify'
 
 function App() {
+  const notify = (message: string) => toast.error(message);
   const location = useLocation();
   const excludedPaths = ["/login", "/signup"];
   const { error } = useApi<void>("/Api/Users/Auth");
@@ -25,6 +24,7 @@ function App() {
 
     if (error) {
       console.error("Session check failed:", error);
+      notify("Session expired! Please log in again.");
     }
   }, [location.pathname]);
 
