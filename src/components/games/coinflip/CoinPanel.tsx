@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { connection } from "./signalr";
-import { useUser } from "../../../context/UserContext";
+// import { useUser } from "../../../context/UserContext"; // Unused
 import type { CoinflipGameRequest, CoinflipSide } from "../../../types/games/coinflip";
 
 type Props = {
@@ -21,7 +21,6 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
   const [rotation, setRotation] = useState(0);
   const [flipping, setFlipping] = useState(false);
   const [currentChoice, setCurrentChoice] = useState<CoinflipSide | null>(null);
-  const user = useUser();
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   /**
@@ -55,7 +54,7 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
     
     timeoutRef.current = setTimeout(() => { onFlipped(); setFlipping(false); setCurrentChoice(null); }, 8000);
 
-  }, [shouldFlip, betData,flipping]); //dependencies in the current useeffect
+  }, [shouldFlip, betData]); //dependencies in the current useeffect
 
   /**
    * is triggered by currentChoice element

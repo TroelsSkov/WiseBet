@@ -1,6 +1,6 @@
 import { useState } from "react";
 import BetPanel from "../../components/games/coinflip/BetPanel";
-import Coin from "../../components/games/coinflip/CoinPanel";
+import Coin from "../../components/games/coinflip/CoinPanel.tsx";
 import type { CoinflipGameRequest } from "../../types/games/coinflip";
 
 function Coinflip() {

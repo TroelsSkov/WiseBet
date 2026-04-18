@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "../form/Button"
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+// import { faPlus } from "@fortawesome/free-solid-svg-icons"; // Unused
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons/faPlusCircle";
 import Modal from "../ui/Modal";
 import Input from "../form/Input";

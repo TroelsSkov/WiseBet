@@ -9,4 +9,10 @@ interface UserRegisterRequest {
     confirmPassword: string;
 }
 
-export { UserLoginRequest, UserRegisterRequest };
+interface User {
+    username: string;
+    FullName: string;
+    saldo: int;
+}
+
+export { UserLoginRequest, UserRegisterRequest, User };

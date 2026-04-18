@@ -1,4 +1,4 @@
-import { ApiResponse, RequestOptions } from "../types/api";
+import type { ApiResponse, RequestOptions } from "../types/api";
 
 async function request<T>(
   method: string,

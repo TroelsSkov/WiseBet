@@ -2,9 +2,10 @@ import BalancePill from "./BalancePill"
 import PlayTimeCounter from "./PlayTimeCounter"
 import wisebetLogo from "../../assets/wisebet.png"
 import UserMenu from "./UserMenu"
-import Button from "../form/Button"
+// import Button from "../form/Button" // Unused
 import DepositButton from "./DepositButton"
 import { Link } from "react-router-dom"
+
 
 function Navigation() {
     return (
@@ -24,7 +25,11 @@ function Navigation() {
                 <div className="flex flex-1 justify-end gap-4">
                     <BalancePill balance={1000} />
                     <DepositButton />
-                    <UserMenu />
+                    <UserMenu user={{
+                        username: "TestUserName",
+                        FullName: "Tester Testerson",
+                        saldo: 1000
+                    }} />
                 </div>
             </div>
         </>

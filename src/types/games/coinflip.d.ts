@@ -1,8 +1,9 @@
 import type { GameRequest, GameResponse } from "./game";
 
+// Virker ikke i BetPanel.tsx
 enum CoinflipSide {
-    Wise,
-    Coin
+    Wise = 0,
+    Coin = 1
 }
 
 interface CoinflipGameResponse extends GameResponse {

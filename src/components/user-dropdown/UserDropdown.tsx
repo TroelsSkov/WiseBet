@@ -1,4 +1,5 @@
 import { apiService } from "../../services/apiService";
+import type { User } from "../../types/user";
 
 interface UserDropdownProps {
     visible: boolean;
@@ -8,7 +9,7 @@ interface UserDropdownProps {
 function UserDropdown({ visible, user }: UserDropdownProps) {
     async function logoutUser() {
         const { error } = await apiService.get(`/logout`);
-        if (!error) refetch();
+        if (!error) console.log("[UserDropdown] refetch()");
     }
 
     return (

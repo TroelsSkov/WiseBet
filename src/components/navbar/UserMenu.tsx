@@ -3,7 +3,7 @@ import { faUser } from "@fortawesome/free-regular-svg-icons";
 import Button from "../form/Button";
 import UserDropdown from "../user-dropdown/UserDropdown";
 import { useState } from "react";
-import { User } from "../../types/user";
+import type { User } from "../../types/user";
 
 interface UserMenuProps {
     user: User;
