@@ -4,17 +4,19 @@ export interface Card {
 }
 
 export type GameStatus =
-  | "Playing"
-  | "PlayerBust"
-  | "DealerBust"
-  | "PlayerWin"
-  | "DealerWin"
-  | "Push";
+  | 0
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5;
 
 export interface BlackjackGameResponse {
   playerHand: Card[];
   dealerVisibleHand: Card[];
   status: GameStatus;
+  dealerScore: number;
+  playerScore: number;
 }
 
 export interface BlackjackGameRequest {
