@@ -7,7 +7,17 @@ import type {
   Card,
 } from "../../../types/games/blackjack";
 
-const USER_ID = "E856CDC4-B1CF-422C-A586-8AFCE9DAD82F";
+const USER_ID = "CFE0AED7-AFC7-40B6-B111-762D052EB1DE";
+
+
+const statusText: Record<number, string> = {
+  0: "Playing",
+  1: "Player bust",
+  2: "Dealer bust",
+  3: "Player wins",
+  4: "Dealer wins",
+  5: "Push",
+};
 
 type Props = {
   betData: BlackjackGameRequest | null;
@@ -26,7 +36,7 @@ function Hand({ title, cards, score }: { title: string; score: number; cards: Ca
             key={i}
             src={getCardImage(card)}
             alt="Card"
-            width={90}
+            width={130}
             height={130}
             style={{
               background: "white",
@@ -83,9 +93,28 @@ export default function CardPanel({ betData, shouldPlay, onGameEnd }: Props) {
       <Hand title="Player: " score={playerScore}  cards={playerHand} />
 
       {status && (
-        <div style={{ color: "white", marginTop: "20px" }}>
-          {status}
-        </div>
+        
+<div
+    
+style={{
+      marginTop: "20px",
+      fontSize: "22px",
+      fontWeight: "bold",
+      color:
+        status === 1 ? "#ff0000" :      // Player bust
+        status === 2 ? "#4ade80" :      // Dealer bust (player vinder)
+        status === 3 ? "#4ade80" :      // Player wins
+        status === 4 ? "#ff0000" :      // Dealer wins
+        status === 5 ? "#eab308" :      // Push
+        status === 0 ? "white" : 
+        "white",
+        
+}}
+  >
+
+    {statusText[status]}
+  </div>
+
       )}
     </div>
   );

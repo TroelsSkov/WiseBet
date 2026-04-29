@@ -4,7 +4,7 @@ import ControlPanel from "../../components/games/blackjack/ControlPanel";
 import CardPanel from "../../components/games/blackjack/CardPanel";
 import type { BlackjackGameRequest } from "../../types/games/blackjack";
 
-const UserId = "E856CDC4-B1CF-422C-A586-8AFCE9DAD82F";
+const UserId = "CFE0AED7-AFC7-40B6-B111-762D052EB1DE";
 
 
 export default function Blackjack() {

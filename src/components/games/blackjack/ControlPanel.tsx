@@ -16,7 +16,7 @@ export default function ControlPanel({
   canAct,
 }: Props) {
   return (
-    <div className="w-[280px] bg-[#1c2340] rounded-2xl p-4 flex flex-col gap-6">
+    <div className="w-[300px] bg-[#1c2340] rounded-2xl p-4 flex flex-col gap-6">
       <BetPanel onBet={onBet} disabled={betDisabled} />
 
       <button
