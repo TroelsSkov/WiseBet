@@ -14,7 +14,7 @@ export default function Blackjack() {
   
 
   return (
-    <div className="h-screen bg-[#0b0f1a] flex items-center justify-between px-32">
+    <div className="h-screen bg-[#0b0f1a] flex items-center justify-between px-30">
       <ControlPanel
         onBet={(data) => {
           setBetData(data);

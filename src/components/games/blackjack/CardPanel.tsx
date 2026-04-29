@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { connection } from "../signalr";
-import { getCardImage } from "../../../assets/utils/cardImage";
+import { getCardImage, CARD_BACK_IMAGE } from "../../../assets/utils/cardImage";
 import type {
   BlackjackGameRequest,
   BlackjackGameResponse,
@@ -25,25 +25,46 @@ type Props = {
   onGameEnd: () => void;
 };
 
-function Hand({ title, cards, score }: { title: string; score: number; cards: Card[] }) {
-  return (
-    <div style={{ marginBottom: "32px" }}>
-      <h3 style={{ color: "white", marginBottom: "12px" }}>{title}{score}</h3>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        {cards.map((card, i) => (
-          <img
-            key={i}
-            src={getCardImage(card)}
-            alt="Card"
-            width={130}
-            height={130}
-            style={{
-              background: "white",
-              borderRadius: "8px",
-            }}
-          />
-        ))}
+function Hand({ 
+  title, 
+  cards, 
+  score,
+  isDealer = false,
+  gameFinished = false
+}: { 
+  title: string; 
+  score: number; 
+  cards: Card[];
+  isDealer?: boolean;
+  gameFinished?: boolean;
+}) {
+  return (
+    <div className="mb-8">
+      <h3 className="text-white mb-3">{title}{score}</h3>
+
+      <div className="flex gap-3">
+        {cards.map((card, i) => {
+          // Show card back for dealer's second card (hole card) - only when game is still playing
+          const isHoleCard = isDealer && i === 1 && !gameFinished;
+          const cardImage = isHoleCard ? CARD_BACK_IMAGE : getCardImage(card);
+          
+          return (
+            <div
+              key={i}
+              className="card-flip"
+              style={{ animationDelay: `${i * 0.15}s` }}
+            >
+              <img
+                src={cardImage}
+                alt={isHoleCard ? "Card" : "Card Back"}
+                width={130}
+                height={130}
+                className="rounded-lg bg-white object-cover"
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -52,6 +73,7 @@ function Hand({ title, cards, score }: { title: string; score: number; cards: Ca
 export default function CardPanel({ betData, shouldPlay, onGameEnd }: Props) {
   const [playerHand, setPlayerHand] = useState<Card[]>([]);
   const [dealerHand, setDealerHand] = useState<Card[]>([]);
+  const [dealerFullHand, setDealerFullHand] = useState<Card[]>([]);
   const [status, setStatus] =
     useState<BlackjackGameResponse["status"] | null>(null);
   const [dealerScore, setDealerScore] = useState<number>(0);
@@ -73,13 +95,23 @@ export default function CardPanel({ betData, shouldPlay, onGameEnd }: Props) {
       console.log("UpdateClient modtaget:", data);
       setPlayerHand(data.playerHand);
       setDealerHand(data.dealerVisibleHand);
+      
+      // Build full dealer hand - visible cards + one hidden card (if only 1 visible)
+      const fullHand = [...data.dealerVisibleHand];
+      
+      // Always add a placeholder for the hole card if we only have 1 visible card
+      if (data.dealerVisibleHand.length === 1) {
+        // Add a placeholder card for the hole card (will show as card back when playing)
+        fullHand.push({ rank: 0, suit: 0 }); // Placeholder - shows card back when playing
+      }
+      
+      setDealerFullHand(fullHand);
       setStatus(data.status);
       setDealerScore(data.dealerScore);
       setPlayerScore(data.playerScore);
 
-
       if (data.status !== 0) {
-        setTimeout(onGameEnd, 2000);
+        setTimeout(onGameEnd, 200);
       }
     };
 
@@ -88,17 +120,26 @@ export default function CardPanel({ betData, shouldPlay, onGameEnd }: Props) {
   }, [onGameEnd]);
 
   return (
-    <div style={{ padding: "40px" }}>
-      <Hand title="Dealer: " score={dealerScore} cards={dealerHand} />
-      <Hand title="Player: " score={playerScore}  cards={playerHand} />
-
-      {status && (
+    <div style={{ padding: "30px" }}>
+      <Hand 
+        title="Dealer: " 
+        score={dealerScore} 
+        cards={dealerFullHand.length > 0 ? dealerFullHand : dealerHand} 
+        isDealer={true}
+        gameFinished={status !== 0 && status !== null}
+      />
+      <Hand 
+        title="Player: " 
+        score={playerScore} 
+        cards={playerHand} 
+      />
+      {status !== null && (
         
 <div
     
 style={{
-      marginTop: "20px",
-      fontSize: "22px",
+      marginTop: "5px",
+      fontSize: "50px",
       fontWeight: "bold",
       color:
         status === 1 ? "#ff0000" :      // Player bust
