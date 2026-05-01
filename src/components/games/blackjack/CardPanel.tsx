@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { connection } from "../signalr";
 import { getCardImage, CARD_BACK_IMAGE } from "../../../assets/utils/cardImage";
 import type {
@@ -6,8 +6,9 @@ import type {
   BlackjackGameResponse,
   Card,
 } from "../../../types/games/blackjack";
+import PlayTimeCounter from "../../navbar/PlayTimeCounter";
 
-const USER_ID = "CFE0AED7-AFC7-40B6-B111-762D052EB1DE";
+// const USER_ID = "94FC84F5-295C-45C9-9128-E28214818B1F";
 
 
 const statusText: Record<number, string> = {
@@ -26,15 +27,15 @@ type Props = {
 };
 
 
-function Hand({ 
-  title, 
-  cards, 
+function Hand({
+  title,
+  cards,
   score,
   isDealer = false,
   gameFinished = false
-}: { 
-  title: string; 
-  score: number; 
+}: {
+  title: string;
+  score: number;
   cards: Card[];
   isDealer?: boolean;
   gameFinished?: boolean;
@@ -48,7 +49,7 @@ function Hand({
           // Show card back for dealer's second card (hole card) - only when game is still playing
           const isHoleCard = isDealer && i === 1 && !gameFinished;
           const cardImage = isHoleCard ? CARD_BACK_IMAGE : getCardImage(card);
-          
+
           return (
             <div
               key={i}
@@ -87,74 +88,97 @@ export default function CardPanel({ betData, shouldPlay, onGameEnd }: Props) {
 
   useEffect(() => {
     if (!shouldPlay || !betData) return;
-    connection.invoke("StartRoundBlackjack", USER_ID, betData.amount);
+    connection.invoke("StartRoundBlackjack", betData.amount);
   }, [shouldPlay, betData]);
+
+  async function updatehand(hand: Card[], setHand: Dispatch<SetStateAction<Card[]>>) {
+    let delay = 0;
+    setHand([]);  
+    for (let card in hand) {
+      console.log(hand[card])
+      setTimeout(() => {
+        console.log("Den bliver indsat nu: " + JSON.stringify(hand[card] + " " + delay))
+        setHand(prev => [...prev, hand[card]]);
+      }, delay);
+      delay += 300;
+    }
+  }
 
   useEffect(() => {
     const handler = (data: BlackjackGameResponse) => {
       console.log("UpdateClient modtaget:", data);
-      setPlayerHand(data.playerHand);
-      setDealerHand(data.dealerVisibleHand);
-      
+      if (playerHand.length == 0)
+        updatehand(data.playerHand, setPlayerHand);
+      else
+        setPlayerHand(data.playerHand)
+
+      // setDealerHand(data.dealerVisibleHand)
+
       // Build full dealer hand - visible cards + one hidden card (if only 1 visible)
       const fullHand = [...data.dealerVisibleHand];
-      
+
       // Always add a placeholder for the hole card if we only have 1 visible card
       if (data.dealerVisibleHand.length === 1) {
         // Add a placeholder card for the hole card (will show as card back when playing)
         fullHand.push({ rank: 0, suit: 0 }); // Placeholder - shows card back when playing
       }
-      
-      setDealerFullHand(fullHand);
+      if (fullHand.length == 2)
+        updatehand(fullHand, setDealerFullHand);
+      else {
+        setDealerFullHand([])
+        updatehand(fullHand, setDealerFullHand);
+      }
+
+      // setDealerFullHand(fullHand);
       setStatus(data.status);
       setDealerScore(data.dealerScore);
       setPlayerScore(data.playerScore);
 
       if (data.status !== 0) {
-        setTimeout(onGameEnd, 200);
+        setTimeout(onGameEnd, 1000);
       }
     };
 
     connection.on("UpdateClient", handler);
     return () => connection.off("UpdateClient", handler);
-  }, [onGameEnd]);
+  }, [onGameEnd, playerHand]);
 
   return (
     <div style={{ padding: "30px" }}>
-      <Hand 
-        title="Dealer: " 
-        score={dealerScore} 
-        cards={dealerFullHand.length > 0 ? dealerFullHand : dealerHand} 
+      <Hand
+        title="Dealer: "
+        score={dealerScore}
+        cards={dealerFullHand.length > 0 ? dealerFullHand : dealerHand}
         isDealer={true}
         gameFinished={status !== 0 && status !== null}
       />
-      <Hand 
-        title="Player: " 
-        score={playerScore} 
-        cards={playerHand} 
+      <Hand
+        title="Player: "
+        score={playerScore}
+        cards={playerHand}
       />
       {status !== null && (
-        
-<div
-    
-style={{
-      marginTop: "5px",
-      fontSize: "50px",
-      fontWeight: "bold",
-      color:
-        status === 1 ? "#ff0000" :      // Player bust
-        status === 2 ? "#4ade80" :      // Dealer bust (player vinder)
-        status === 3 ? "#4ade80" :      // Player wins
-        status === 4 ? "#ff0000" :      // Dealer wins
-        status === 5 ? "#eab308" :      // Push
-        status === 0 ? "white" : 
-        "white",
-        
-}}
-  >
 
-    {statusText[status]}
-  </div>
+        <div
+
+          style={{
+            marginTop: "5px",
+            fontSize: "50px",
+            fontWeight: "bold",
+            color:
+              status === 1 ? "#ff0000" :      // Player bust
+                status === 2 ? "#4ade80" :      // Dealer bust (player vinder)
+                  status === 3 ? "#4ade80" :      // Player wins
+                    status === 4 ? "#ff0000" :      // Dealer wins
+                      status === 5 ? "#eab308" :      // Push
+                        status === 0 ? "white" :
+                          "white",
+
+          }}
+        >
+
+          {statusText[status]}
+        </div>
 
       )}
     </div>

@@ -4,7 +4,7 @@ import ControlPanel from "../../components/games/blackjack/ControlPanel";
 import CardPanel from "../../components/games/blackjack/CardPanel";
 import type { BlackjackGameRequest } from "../../types/games/blackjack";
 
-const UserId = "CFE0AED7-AFC7-40B6-B111-762D052EB1DE";
+// const UserId = "94FC84F5-295C-45C9-9128-E28214818B1F";
 
 
 export default function Blackjack() {
@@ -21,8 +21,8 @@ export default function Blackjack() {
           setShouldPlay(true);
         }}
 
-        onHit={() => connection.invoke("HitBlackjack", UserId)}
-        onStand={() => connection.invoke("StandBlackjack", UserId)}
+        onHit={() => connection.invoke("HitBlackjack")}
+        onStand={() => connection.invoke("StandBlackjack")}
         betDisabled={shouldPlay}
         canAct={shouldPlay}
       />
