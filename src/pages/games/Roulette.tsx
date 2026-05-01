@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import NumberHistory, { getRouletteColor } from "../../components/games/roulette/NumberHistory";
+import NumberHistory from "../../components/games/roulette/NumberHistory";
 import RouletteRoller from "../../components/games/roulette/RouletteRoller";
+import RouletteStatusBar from "../../components/games/roulette/RouletteStatusBar";
+import RouletteBetInput from "../../components/games/roulette/RouletteBetInput";
 import BettingColumn from "../../components/games/roulette/BettingColumn";
 import { connection } from "../../components/games/roulette/signalr";
 import type { RouletteBetEntry } from "../../types/games/roulette";
-import { formatNumber } from "../../utils/formatNumber";
 
 const TEMP_USER_ID = "00000000-0000-0000-0000-000000000000";
 
@@ -56,12 +57,10 @@ export default function Roulette() {
     const [bets, setBets] = useState(MOCK_BETS);
     const [amount, setAmount] = useState("");
 
-    // Roller state
     const [spinning, setSpinning] = useState(false);
     const [rollerResult, setRollerResult] = useState<number | null>(null);
     const [displayResult, setDisplayResult] = useState<number | null>(null);
 
-    // Refs
     const countdownRef = useRef(ROUND_DURATION);
     const intervalRef = useRef<ReturnType<typeof setInterval>>(null);
     const rollerResultRef = useRef<number | null>(null);
@@ -69,7 +68,7 @@ export default function Roulette() {
 
     const locked = countdown <= LOCK_AT;
 
-    // ── SignalR: opret forbindelse ──────────────────────────────────────────
+    // ── SignalR: opret forbindelse ─────────────────────────────────────────
     useEffect(() => {
         if (connection.state === "Disconnected") {
             connection
@@ -79,7 +78,23 @@ export default function Roulette() {
         }
     }, []);
 
-    // ── SignalR: lyt på runderesultat fra server ───────────────────────────
+    // ── SignalR: ny runde starter, backend sender sekunder tilbage ────────
+    useEffect(() => {
+        const handler = (seconds: number) => {
+            countdownRef.current = seconds;
+            setCountdown(seconds);
+            spinningRef.current = false;
+            setSpinning(false);
+            setRollerResult(null);
+            rollerResultRef.current = null;
+            setDisplayResult(null);
+            setBets({ black: [], green: [], red: [] });
+        };
+        connection.on("RoundStarted", handler);
+        return () => connection.off("RoundStarted", handler);
+    }, []);
+
+    // ── SignalR: lyt på runderesultat fra server ──────────────────────────
     useEffect(() => {
         const handler = (data: RouletteResult) => {
             rollerResultRef.current = data.result;
@@ -97,7 +112,7 @@ export default function Roulette() {
         return () => connection.off("ErrorMessageToClient", handler);
     }, []);
 
-    // ── Lokal nedtælling (fjernes / erstattes af RoundTimer fra server) ───
+    // ── Lokal nedtælling — tæller ned, backend styrer start og resultat ───
     useEffect(() => {
         intervalRef.current = setInterval(() => {
             if (spinningRef.current) return;
@@ -106,12 +121,13 @@ export default function Roulette() {
             setCountdown(countdownRef.current);
 
             if (countdownRef.current <= 0) {
-                // TODO: fjern dette når backend sender resultatet via UpdateClient
-                const result = randomRoulette();
-                rollerResultRef.current = result;
                 spinningRef.current = true;
                 setSpinning(true);
-                setTimeout(() => setRollerResult(rollerResultRef.current), 4000);
+                // TODO: fjern når backend sender UpdateClient og RoundStarted
+                setTimeout(() => {
+                    rollerResultRef.current = randomRoulette();
+                    setRollerResult(rollerResultRef.current);
+                }, 4000);
             }
         }, 1000);
 
@@ -120,14 +136,14 @@ export default function Roulette() {
         };
     }, []);
 
-    // ── Kaldes af rolleren når animationen er færdig ───────────────────────
+    // ── Kaldes af rolleren når animationen er færdig ──────────────────────
     function handleSpinEnd() {
         const result = rollerResultRef.current;
         if (result === null) return;
 
         setDisplayResult(result);
-        setHistory((h: number[]) => [...h.slice(-19), result]);
-        setFrame((f: number) => f + 1);
+        setHistory((h) => [...h.slice(-19), result]);
+        setFrame((f) => f + 1);
         setBets({ black: [], green: [], red: [] });
 
         setTimeout(() => {
@@ -141,14 +157,14 @@ export default function Roulette() {
         }, 2000);
     }
 
-    // ── Placer bet ─────────────────────────────────────────────────────────
+    // ── Placer bet ────────────────────────────────────────────────────────
     function placeBet(color: "black" | "green" | "red") {
         const numeric = Number(amount);
         if (!numeric || numeric <= 0) return;
 
-        setBets((prev: typeof MOCK_BETS) => ({
+        setBets((prev) => ({
             ...prev,
-            [color]: [...prev[color], { username: "MortenAggerSmækkerLækker", amount: numeric }],
+            [color]: [...prev[color], { username: "du", amount: numeric }],
         }));
 
         // TODO: uncomment når backend er klar
@@ -161,116 +177,37 @@ export default function Roulette() {
 
     return (
         <div className="flex flex-col h-full gap-3 p-2">
-            {/* Number history */}
+
             <div className="bg-[#11172c] rounded-xl p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
                 <NumberHistory history={history} />
             </div>
 
-            {/* Roller */}
             <div className="bg-[#11172c] rounded-xl p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
-                <RouletteRoller
-                    spinning={spinning}
-                    result={rollerResult}
-                    onSpinEnd={handleSpinEnd}
-                />
+                <RouletteRoller spinning={spinning} result={rollerResult} onSpinEnd={handleSpinEnd} />
             </div>
 
-            {/* Status bar */}
-            <div className="bg-[#11172c] rounded-xl px-6 py-3 flex items-center justify-between shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
-                <span className="text-[#4a5580] text-sm">Frame {frame}</span>
+            <RouletteStatusBar
+                displayResult={displayResult}
+                spinning={spinning}
+                locked={locked}
+                countdown={countdown}
+                totalBets={totalBets}
+                frame={frame}
+                roundDuration={ROUND_DURATION}
+            />
 
-                <div className="flex flex-col items-center gap-1">
-                    {displayResult !== null ? (
-                        <span className={`text-xl font-bold tracking-wide
-                            ${getRouletteColor(displayResult) === "green" ? "text-green-400" :
-                              getRouletteColor(displayResult) === "red" ? "text-red-400" : "text-[#d0d4ff]"}`}>
-                            Resultat: {displayResult}
-                        </span>
-                    ) : spinning ? (
-                        <span className="text-base font-bold tracking-widest uppercase text-[#d0d4ff] animate-pulse">
-                            RULLER...
-                        </span>
-                    ) : (
-                        <span className={`text-base font-bold tracking-widest uppercase
-                            ${locked ? "text-red-400 animate-pulse" : "text-[#d0d4ff]"}`}>
-                            {locked
-                                ? `LÅST — ${countdown}s`
-                                : `RULLER OM ${countdown} sekunder`}
-                        </span>
-                    )}
-                    <div className="w-64 h-1.5 bg-[#1c2340] rounded-full overflow-hidden">
-                        <div
-                            className={`h-full rounded-full transition-all duration-1000 ease-linear
-                                ${locked ? "bg-red-500" : "bg-[#00ff88]"}`}
-                            style={{ width: `${(countdown / ROUND_DURATION) * 100}%` }}
-                        />
-                    </div>
-                </div>
+            <RouletteBetInput
+                amount={amount}
+                onChange={setAmount}
+                disabled={spinning || locked}
+            />
 
-                <span className="text-[#4a5580] text-sm">
-                    Total: <span className="text-[#9cffb0] font-semibold">{formatNumber(totalBets)}</span>
-                </span>
-            </div>
-
-            {/* Bet amount input */}
-            <div className="bg-[#11172c] rounded-xl px-6 py-3 flex items-center gap-3 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
-                <span className="text-[#9cffb0] font-bold text-lg">$</span>
-                <input
-                    type="number"
-                    placeholder="Beløb"
-                    value={amount}
-                    disabled={spinning || locked}
-                    onChange={(e) => {
-                        const v = e.target.value;
-                        if (v === "" || Number(v) >= 0) setAmount(v);
-                    }}
-                    className="flex-1 bg-[#1c2340] text-white placeholder-[#4a5580] rounded-lg px-4 py-2 outline-none border border-transparent focus:border-[#00ff88]/30 transition disabled:opacity-50"
-                />
-                <div className="flex gap-1 bg-[#0f1528] rounded-lg p-1">
-                    <button
-                        onClick={() => setAmount((Math.max(0, Number(amount) / 2)).toString())}
-                        disabled={spinning || locked}
-                        className="text-white text-xs px-3 py-1.5 rounded hover:bg-[#2a3350] transition disabled:opacity-50"
-                    >
-                        ½
-                    </button>
-                    <button
-                        onClick={() => setAmount((Math.max(0, Number(amount) * 2)).toString())}
-                        disabled={spinning || locked}
-                        className="text-white text-xs px-3 py-1.5 rounded hover:bg-[#2a3350] transition disabled:opacity-50"
-                    >
-                        2x
-                    </button>
-                </div>
-            </div>
-
-            {/* Betting columns */}
             <div className="flex gap-4 flex-1 min-h-0">
-                <BettingColumn
-                    theme="black"
-                    label="Sort"
-                    bets={bets.black}
-                    totalAmount={sumBets(bets.black)}
-                    onBet={() => placeBet("black")}
-                    disabled={spinning || locked}
-                />
-                <BettingColumn
-                    theme="green"
-                    label="0 — Grøn"
-                    bets={bets.green}
-                    totalAmount={sumBets(bets.green)}
-                    onBet={() => placeBet("green")}
-                    disabled={spinning || locked}
-                />
-                <BettingColumn
-                    theme="red"
-                    label="Rød"
-                    bets={bets.red}
-                    totalAmount={sumBets(bets.red)}
-                    onBet={() => placeBet("red")}
-                    disabled={spinning || locked}
-                />
+                <BettingColumn theme="black" label="Sort" bets={bets.black} totalAmount={sumBets(bets.black)} onBet={() => placeBet("black")} disabled={spinning || locked} />
+                <BettingColumn theme="green" label="0 — Grøn" bets={bets.green} totalAmount={sumBets(bets.green)} onBet={() => placeBet("green")} disabled={spinning || locked} />
+                <BettingColumn theme="red" label="Rød" bets={bets.red} totalAmount={sumBets(bets.red)} onBet={() => placeBet("red")} disabled={spinning || locked} />
             </div>
+
         </div>
     );
 }
