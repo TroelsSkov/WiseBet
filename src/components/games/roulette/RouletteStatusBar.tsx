@@ -5,13 +5,14 @@ type Props = {
     displayResult: number | null;
     spinning: boolean;
     locked: boolean;
+    connected: boolean;
     countdown: number;
     totalBets: number;
     frame: number;
     roundDuration: number;
 };
 
-export default function RouletteStatusBar({ displayResult, spinning, locked, countdown, totalBets, frame, roundDuration }: Props) {
+export default function RouletteStatusBar({ displayResult, spinning, locked, connected, countdown, totalBets, frame, roundDuration }: Props) {
     return (
         <div className="bg-[#11172c] rounded-xl px-6 py-3 flex items-center justify-between shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
 
@@ -20,7 +21,11 @@ export default function RouletteStatusBar({ displayResult, spinning, locked, cou
 
             {/* Status tekst + progressbar */}
             <div className="flex flex-col items-center gap-1">
-                {displayResult !== null ? (
+                {!connected ? (
+                    <span className="text-base font-bold tracking-widest uppercase text-[#4a5580] animate-pulse">
+                        FORBINDER...
+                    </span>
+                ) : displayResult !== null ? (
                     <span className={`text-xl font-bold tracking-wide
                         ${getRouletteColor(displayResult) === "green" ? "text-green-400" :
                           getRouletteColor(displayResult) === "red" ? "text-red-400" : "text-[#d0d4ff]"}`}>

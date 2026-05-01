@@ -5,146 +5,122 @@ import RouletteStatusBar from "../../components/games/roulette/RouletteStatusBar
 import RouletteBetInput from "../../components/games/roulette/RouletteBetInput";
 import BettingColumn from "../../components/games/roulette/BettingColumn";
 import { connection } from "../../components/games/roulette/signalr";
-import type { RouletteBetEntry } from "../../types/games/roulette";
+import { RouletteSessionStatus, RouletteBetType } from "../../types/games/roulette";
+import type { RouletteDto, RouletteBetEntryDto } from "../../types/games/roulette";
 
-const TEMP_USER_ID = "00000000-0000-0000-0000-000000000000";
-
-const ROUND_DURATION = 30;
-const LOCK_AT = 5;
-
-const COLOR_TO_INT: Record<"black" | "green" | "red", number> = {
-    black: 0,
-    green: 1,
-    red: 2,
+const BET_TYPE: Record<"black" | "green" | "red", RouletteBetType> = {
+    green: RouletteBetType.Green,
+    red: RouletteBetType.Red,
+    black: RouletteBetType.Black,
 };
 
-const MOCK_HISTORY = [17, 0, 24, 3, 34, 21, 10, 7, 15, 32, 6, 1, 28, 11, 19];
+type BetsByColor = Record<"black" | "green" | "red", RouletteBetEntryDto[]>;
 
-const MOCK_BETS: Record<"black" | "green" | "red", RouletteBetEntry[]> = {
-    black: [
-        { username: "drietgangsta", amount: 12000 },
-        { username: "hamburger", amount: 5500 },
-        { username: "nygaard", amount: 3200 },
-    ],
-    green: [
-        { username: "highroller99", amount: 25000 },
-    ],
-    red: [
-        { username: "drietgangsta", amount: 12000 },
-        { username: "hamburger", amount: 12000 },
-        { username: "xXSlayerXx", amount: 8750 },
-    ],
-};
-
-type RouletteResult = {
-    result: number;
-    winnings: number;
-    message: string;
-};
-
-function randomRoulette(): number {
-    return Math.floor(Math.random() * 37);
+function groupBets(entries: RouletteBetEntryDto[]): BetsByColor {
+    const groups: BetsByColor = { black: [], green: [], red: [] };
+    for (const entry of entries) {
+        if (entry.betType === RouletteBetType.Black) groups.black.push(entry);
+        else if (entry.betType === RouletteBetType.Red) groups.red.push(entry);
+        else groups.green.push(entry);
+    }
+    return groups;
 }
 
-function sumBets(bets: RouletteBetEntry[]): number {
-    return bets.reduce((acc, b) => acc + b.amount, 0);
+function sumBets(entries: RouletteBetEntryDto[]): number {
+    return entries.reduce((acc, b) => acc + b.amount, 0);
 }
 
 export default function Roulette() {
-    const [history, setHistory] = useState<number[]>(MOCK_HISTORY);
-    const [countdown, setCountdown] = useState(ROUND_DURATION);
+    const [history, setHistory] = useState<number[]>([]);
+    const [countdown, setCountdown] = useState(0);
     const [frame, setFrame] = useState(137);
-    const [bets, setBets] = useState(MOCK_BETS);
+    const [bets, setBets] = useState<BetsByColor>({ black: [], green: [], red: [] });
     const [amount, setAmount] = useState("");
-
     const [spinning, setSpinning] = useState(false);
     const [rollerResult, setRollerResult] = useState<number | null>(null);
     const [displayResult, setDisplayResult] = useState<number | null>(null);
+    const [status, setStatus] = useState<RouletteSessionStatus>(RouletteSessionStatus.WaitingForPlayers);
+    const [connected, setConnected] = useState(false);
 
-    const countdownRef = useRef(ROUND_DURATION);
-    const intervalRef = useRef<ReturnType<typeof setInterval>>(null);
-    const rollerResultRef = useRef<number | null>(null);
     const spinningRef = useRef(false);
+    const rollerResultRef = useRef<number | null>(null);
 
-    const locked = countdown <= LOCK_AT;
+    const locked =
+        !connected ||
+        spinning ||
+        status === RouletteSessionStatus.RoundFinished ||
+        countdown <= 5;
 
-    // ── SignalR: opret forbindelse ─────────────────────────────────────────
+    // Connect og join session
     useEffect(() => {
-        if (connection.state === "Disconnected") {
-            connection
-                .start()
-                .then(() => console.log("Roulette SignalR connected"))
-                .catch(console.error);
+        async function connect() {
+            if (connection.state === "Disconnected") {
+                try {
+                    await connection.start();
+                } catch (err) {
+                    console.error("SignalR connect failed:", err);
+                    return;
+                }
+            }
+            try {
+                await connection.invoke("JoinRouletteSession");
+            } catch (err) {
+                console.error("JoinRouletteSession failed:", err);
+            }
         }
-    }, []);
+        connect();
 
-    // ── SignalR: ny runde starter, backend sender sekunder tilbage ────────
-    useEffect(() => {
-        const handler = (seconds: number) => {
-            countdownRef.current = seconds;
-            setCountdown(seconds);
-            spinningRef.current = false;
-            setSpinning(false);
-            setRollerResult(null);
-            rollerResultRef.current = null;
-            setDisplayResult(null);
-            setBets({ black: [], green: [], red: [] });
+        return () => {
+            if (connection.state === "Connected") {
+                connection.invoke("LeaveRouletteSession").catch(console.error);
+            }
         };
-        connection.on("RoundStarted", handler);
-        return () => connection.off("RoundStarted", handler);
     }, []);
 
-    // ── SignalR: lyt på runderesultat fra server ──────────────────────────
+    // Modtag løbende state fra backend
     useEffect(() => {
-        const handler = (data: RouletteResult) => {
-            rollerResultRef.current = data.result;
-            setRollerResult(data.result);
-            console.log("Resultat:", data.result, "Gevinst:", data.winnings);
+        const handler = (dto: RouletteDto) => {
+            setConnected(true);
+            setStatus(dto.status);
+            setBets(groupBets(dto.currentRoundBets));
+
+            // Opdater ikke countdown mens animationen kører — ellers tæller den ned imens hjulet spinner
+            if (!spinningRef.current) {
+                setCountdown(dto.secondsLeft);
+            }
+
+            // Backenden sender aldrig Spinning som stabil tilstand — trigger på RoundFinished
+            if (
+                dto.status === RouletteSessionStatus.RoundFinished &&
+                dto.winningNumber !== null &&
+                !spinningRef.current
+            ) {
+                const winningNumber = dto.winningNumber;
+                spinningRef.current = true;
+                rollerResultRef.current = winningNumber;
+                setSpinning(true); // Phase 1: hurtig spin (result=null)
+                setTimeout(() => {
+                    setRollerResult(winningNumber); // Phase 2: decelerer til vindertal
+                }, 2000);
+            }
         };
         connection.on("UpdateClient", handler);
         return () => connection.off("UpdateClient", handler);
     }, []);
 
-    // ── SignalR: lyt på fejl fra server ───────────────────────────────────
     useEffect(() => {
         const handler = (msg: string) => console.error("Server fejl:", msg);
         connection.on("ErrorMessageToClient", handler);
         return () => connection.off("ErrorMessageToClient", handler);
     }, []);
 
-    // ── Lokal nedtælling — tæller ned, backend styrer start og resultat ───
-    useEffect(() => {
-        intervalRef.current = setInterval(() => {
-            if (spinningRef.current) return;
-
-            countdownRef.current -= 1;
-            setCountdown(countdownRef.current);
-
-            if (countdownRef.current <= 0) {
-                spinningRef.current = true;
-                setSpinning(true);
-                // TODO: fjern når backend sender UpdateClient og RoundStarted
-                setTimeout(() => {
-                    rollerResultRef.current = randomRoulette();
-                    setRollerResult(rollerResultRef.current);
-                }, 4000);
-            }
-        }, 1000);
-
-        return () => {
-            if (intervalRef.current) clearInterval(intervalRef.current);
-        };
-    }, []);
-
-    // ── Kaldes af rolleren når animationen er færdig ──────────────────────
     function handleSpinEnd() {
         const result = rollerResultRef.current;
-        if (result === null) return;
-
-        setDisplayResult(result);
-        setHistory((h) => [...h.slice(-19), result]);
-        setFrame((f) => f + 1);
-        setBets({ black: [], green: [], red: [] });
+        if (result !== null) {
+            setDisplayResult(result);
+            setHistory((h) => [...h.slice(-19), result]);
+            setFrame((f) => f + 1);
+        }
 
         setTimeout(() => {
             setDisplayResult(null);
@@ -152,24 +128,13 @@ export default function Roulette() {
             rollerResultRef.current = null;
             spinningRef.current = false;
             setSpinning(false);
-            countdownRef.current = ROUND_DURATION;
-            setCountdown(ROUND_DURATION);
         }, 2000);
     }
 
-    // ── Placer bet ────────────────────────────────────────────────────────
     function placeBet(color: "black" | "green" | "red") {
         const numeric = Number(amount);
         if (!numeric || numeric <= 0) return;
-
-        setBets((prev) => ({
-            ...prev,
-            [color]: [...prev[color], { username: "du", amount: numeric }],
-        }));
-
-        // TODO: uncomment når backend er klar
-        // connection.invoke("PlayRound", TEMP_USER_ID, numeric, COLOR_TO_INT[color]);
-
+        connection.invoke("PlaceRouletteBet", { amount: numeric, betType: BET_TYPE[color] }).catch(console.error);
         setAmount("");
     }
 
@@ -190,10 +155,11 @@ export default function Roulette() {
                 displayResult={displayResult}
                 spinning={spinning}
                 locked={locked}
+                connected={connected}
                 countdown={countdown}
                 totalBets={totalBets}
                 frame={frame}
-                roundDuration={ROUND_DURATION}
+                roundDuration={30}
             />
 
             <RouletteBetInput
@@ -211,5 +177,3 @@ export default function Roulette() {
         </div>
     );
 }
-
-export { TEMP_USER_ID, COLOR_TO_INT };

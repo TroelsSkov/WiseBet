@@ -1,4 +1,4 @@
-import type { RouletteBetEntry } from "../../../types/games/roulette";
+import type { RouletteBetEntryDto } from "../../../types/games/roulette";
 import { formatNumber } from "../../../utils/formatNumber";
 
 type ColorTheme = "black" | "green" | "red";
@@ -6,7 +6,7 @@ type ColorTheme = "black" | "green" | "red";
 type Props = {
     theme: ColorTheme;
     label: string;
-    bets: RouletteBetEntry[];
+    bets: RouletteBetEntryDto[];
     totalAmount: number;
     onBet: () => void;
     disabled: boolean;

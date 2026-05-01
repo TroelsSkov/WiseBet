@@ -17,7 +17,16 @@ export default defineConfig({
     port: 8080,
     strictPort: true,
     host: true,
-    origin: "http://0.0.0.0:8080"
+    proxy: {
+      '/Api': {
+        target: 'http://localhost:5277',
+        changeOrigin: true,
+      },
+      '/Gamehub': {
+        target: 'http://localhost:5277',
+        changeOrigin: true,
+        ws: true,
+      },
+    },
   },
-  
 })
