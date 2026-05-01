@@ -9,9 +9,15 @@ import type { BlackjackGameRequest } from "../../types/games/blackjack";
 
 export default function Blackjack() {
   const [betData, setBetData] =
-  useState<BlackjackGameRequest | null>(null);
+    useState<BlackjackGameRequest | null>(null);
   const [shouldPlay, setShouldPlay] = useState(false);
-  
+  const option = useState<string>("stand");
+
+  connection.off("NextAction");
+  connection.on("NextAction", ((): any => {
+    console.log("Was here");
+    return "stand";
+  }) as any);
 
   return (
     <div className="h-screen bg-[#0b0f1a] flex items-center justify-between px-30">

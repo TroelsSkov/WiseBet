@@ -93,7 +93,7 @@ export default function CardPanel({ betData, shouldPlay, onGameEnd }: Props) {
 
   async function updatehand(hand: Card[], setHand: Dispatch<SetStateAction<Card[]>>) {
     let delay = 0;
-    setHand([]);  
+    setHand([]);
     for (let card in hand) {
       console.log(hand[card])
       setTimeout(() => {
