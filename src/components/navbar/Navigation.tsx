@@ -1,6 +1,5 @@
 import BalancePill from "./BalancePill"
 import PlayTimeCounter from "./PlayTimeCounter"
-import wisebetLogo from "../../assets/wisebet.png"
 import UserMenu from "./UserMenu"
 // import Button from "../form/Button" // Unused
 import DepositButton from "./DepositButton"
@@ -13,7 +12,7 @@ function Navigation() {
             <div className=" h-full flex items-center mx-8">
                 <div className="flex-1">
                     <Link to="/" className="flex items-center">
-                        <img src={wisebetLogo} className="h-12 w-12" alt="WiseBet logo" />
+                        <img src="/wisebet.png" className="h-10 w-10 rounded-xl" alt="WiseBet logo" />
                         <p className="ml-2 text-xl font-bold">WiseBet</p>
                     </Link>
                 </div>

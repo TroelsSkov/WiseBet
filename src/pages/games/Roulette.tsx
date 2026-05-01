@@ -65,6 +65,7 @@ export default function Roulette() {
     const countdownRef = useRef(ROUND_DURATION);
     const intervalRef = useRef<ReturnType<typeof setInterval>>(null);
     const rollerResultRef = useRef<number | null>(null);
+    const spinningRef = useRef(false);
 
     const locked = countdown <= LOCK_AT;
 
@@ -99,18 +100,19 @@ export default function Roulette() {
     // ── Lokal nedtælling (fjernes / erstattes af RoundTimer fra server) ───
     useEffect(() => {
         intervalRef.current = setInterval(() => {
+            if (spinningRef.current) return;
+
             countdownRef.current -= 1;
+            setCountdown(countdownRef.current);
 
             if (countdownRef.current <= 0) {
                 // TODO: fjern dette når backend sender resultatet via UpdateClient
                 const result = randomRoulette();
                 rollerResultRef.current = result;
+                spinningRef.current = true;
                 setSpinning(true);
-                setTimeout(() => setRollerResult(rollerResultRef.current), 5000);
-                countdownRef.current = ROUND_DURATION;
+                setTimeout(() => setRollerResult(rollerResultRef.current), 4000);
             }
-
-            setCountdown(countdownRef.current);
         }, 1000);
 
         return () => {
@@ -132,8 +134,11 @@ export default function Roulette() {
             setDisplayResult(null);
             setRollerResult(null);
             rollerResultRef.current = null;
+            spinningRef.current = false;
             setSpinning(false);
-        }, 4000);
+            countdownRef.current = ROUND_DURATION;
+            setCountdown(ROUND_DURATION);
+        }, 2000);
     }
 
     // ── Placer bet ─────────────────────────────────────────────────────────
@@ -143,7 +148,7 @@ export default function Roulette() {
 
         setBets((prev: typeof MOCK_BETS) => ({
             ...prev,
-            [color]: [...prev[color], { username: "du", amount: numeric }],
+            [color]: [...prev[color], { username: "MortenAggerSmækkerLækker", amount: numeric }],
         }));
 
         // TODO: uncomment når backend er klar
@@ -180,6 +185,10 @@ export default function Roulette() {
                             ${getRouletteColor(displayResult) === "green" ? "text-green-400" :
                               getRouletteColor(displayResult) === "red" ? "text-red-400" : "text-[#d0d4ff]"}`}>
                             Resultat: {displayResult}
+                        </span>
+                    ) : spinning ? (
+                        <span className="text-base font-bold tracking-widest uppercase text-[#d0d4ff] animate-pulse">
+                            RULLER...
                         </span>
                     ) : (
                         <span className={`text-base font-bold tracking-widest uppercase
