@@ -10,6 +10,6 @@ import * as signalR from "@microsoft/signalr";
  */
 export const connection = new signalR.HubConnectionBuilder()
   .withUrl(`${import.meta.env.VITE_BACKEND_URL}/GameHub`, {withCredentials: true})
-  .configureLogging(signalR.LogLevel.Trace)
+  // .configureLogging(signalR.LogLevel.Trace) // Kan anvendes til debugging
   .withAutomaticReconnect()
   .build();

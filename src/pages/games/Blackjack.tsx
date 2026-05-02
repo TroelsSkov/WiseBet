@@ -29,6 +29,7 @@ export default function Blackjack() {
 
     const userAction = await promise;
     console.log("[NextAction] User action has been recieved")
+    
     return userAction;
   }) as any);
 
