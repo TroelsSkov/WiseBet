@@ -11,12 +11,25 @@ export default function Blackjack() {
   const [betData, setBetData] =
     useState<BlackjackGameRequest | null>(null);
   const [shouldPlay, setShouldPlay] = useState(false);
-  const option = useState<string>("stand");
+  let answer: ((value: string) => void) | null = null;
+
+  function onUserActionDecided(NextAction: string) {
+    if (answer) {
+      answer(NextAction)
+      answer = null;
+    }
+  }
 
   connection.off("NextAction");
-  connection.on("NextAction", ((): any => {
-    console.log("Was here");
-    return "stand";
+  connection.on("NextAction", (async (): Promise<any> => {
+
+    const promise = new Promise<string>((resolve) => {
+      answer = resolve;
+    })
+
+    const userAction = await promise;
+    console.log("[NextAction] User action has been recieved")
+    return userAction;
   }) as any);
 
   return (
@@ -27,8 +40,8 @@ export default function Blackjack() {
           setShouldPlay(true);
         }}
 
-        onHit={() => connection.invoke("HitBlackjack")}
-        onStand={() => connection.invoke("StandBlackjack")}
+        onHit={() => onUserActionDecided("hit")}
+        onStand={() => onUserActionDecided("stand")}
         betDisabled={shouldPlay}
         canAct={shouldPlay}
       />
