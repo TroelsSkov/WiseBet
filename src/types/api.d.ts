@@ -4,7 +4,6 @@ interface RequestOptions {
 
 interface ApiResponse<T> {
   data: T | null;
-  ok: boolean;
   error: string | null;
   status: number;
 }

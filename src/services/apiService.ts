@@ -18,7 +18,7 @@ async function request<T>(
 
   if (!res.ok) {
     const message = await res.text();
-    return { data: null, ok: res.ok, error: message, status: res.status };
+    return { data: null, error: message, status: res.status };
   }
 
   const contentType = res.headers.get("Content-Type") ?? "";
@@ -26,7 +26,7 @@ async function request<T>(
     ? await res.json()
     : (await res.text()) as T;
 
-  return { data, ok: res.ok, error: null, status: res.status };
+  return { data, error: null, status: res.status };
 }
 
 export const apiService = {
