@@ -4,9 +4,12 @@ import { useState } from "react";
 import Input from "../components/form/Input";
 import Button from "../components/form/Button";
 import wisebetLogo from "../assets/wisebet.png"
+import { toast } from 'react-toastify';
 
 function Login() {
     const navigate = useNavigate();
+    const notify = (message: string) => toast.success(message);
+    const notifyError = (message: string) => toast.error(message);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
@@ -17,8 +20,11 @@ function Login() {
             .then(({ error }) => {
                 if (error) {
                     console.error("Login failed:", error);
+                    notifyError("Login failed: " + error);
                     return;
                 }
+
+                notify("Login successful!");
 
                 navigate("/");
             });
