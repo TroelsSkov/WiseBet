@@ -1,11 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BetPanel from "../../components/games/coinflip/BetPanel";
 import Coin from "../../components/games/coinflip/CoinPanel.tsx";
 import type { CoinflipGameRequest } from "../../types/games/coinflip";
+import { triggerSaldoEvent } from "../../services/globalEvents.ts";
 
 function Coinflip() {
   const [betData, setBetData] = useState<CoinflipGameRequest | null>(null);
   const [shouldFlip, setShouldFlip] = useState(false);
+
+  const event = () => {
+    triggerSaldoEvent('saldo-event', {});
+  }
+
+  useEffect(() => {
+    console.log("Tried updating saldo");
+    if (!shouldFlip)
+      setTimeout(() => {
+        event();
+      }, 8000);
+  }, [shouldFlip])
+
 
   return (
     <>

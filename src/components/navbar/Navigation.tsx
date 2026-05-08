@@ -23,6 +23,7 @@ function Navigation() {
     }, [])
 
     useEventListener('saldo-event', ({ }) => {
+        console.log("[Navigation] Saldo tried updating");
         apiService.get("/Api/Users/me/UserAccount/saldo").then((res) => {
             console.log(res.data);
             setUserSaldo(res.data as number);
