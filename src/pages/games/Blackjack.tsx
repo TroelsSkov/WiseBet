@@ -14,10 +14,6 @@ export default function Blackjack() {
   const [shouldPlay, setShouldPlay] = useState(false);
   let answer: ((value: string) => void) | null = null;
 
-  const event = () => {
-    triggerSaldoEvent('saldo-event', {});
-  }
-
   function onUserActionDecided(NextAction: string) {
     if (answer) {
       answer(NextAction)

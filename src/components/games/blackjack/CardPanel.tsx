@@ -7,6 +7,7 @@ import type {
   Card,
 } from "../../../types/games/blackjack";
 import PlayTimeCounter from "../../navbar/PlayTimeCounter";
+import { triggerSaldoEvent } from "../../../services/globalEvents";
 
 // const USER_ID = "94FC84F5-295C-45C9-9128-E28214818B1F";
 
@@ -80,6 +81,10 @@ export default function CardPanel({ betData, shouldPlay, onGameEnd }: Props) {
   const [dealerScore, setDealerScore] = useState<number>(0);
   const [playerScore, setPlayerScore] = useState<number>(0);
 
+  const event = () => {
+    triggerSaldoEvent('saldo-event', {});
+  }
+
   useEffect(() => {
     if (connection.state === "Disconnected") {
       connection.start();
@@ -136,6 +141,9 @@ export default function CardPanel({ betData, shouldPlay, onGameEnd }: Props) {
 
       if (data.status !== 0) {
         setTimeout(onGameEnd, 1000);
+        setTimeout(() => {
+          event();
+        }, 300 * fullHand.length);
       }
     };
 
