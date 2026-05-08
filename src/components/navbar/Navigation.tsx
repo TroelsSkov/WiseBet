@@ -24,7 +24,7 @@ function Navigation() {
                 </div>
 
                 <div className="flex flex-1 justify-end gap-4">
-                    {user && <BalancePill balance={user.saldo} />}
+                    {user && <BalancePill balance={user.balance} />}
                     {user && <DepositButton />}
                     {user ? (
                         <UserMenu user={user} />

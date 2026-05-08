@@ -2,9 +2,7 @@ import { createContext, useContext, useState, useEffect  } from "react";
 import { apiService } from "../services/apiService";
 import type { User } from "../types/user";
 
-// type User = {
-//   id: string;
-// };
+
 
 type UserContextType = {
     user: User | null;
@@ -22,7 +20,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             const { data, error } = await apiService.get<string>("/Api/Users/Auth");
             if (!error && data) {
                 const username = data.split(": ")[1] ?? "Ukendt";
-                setUser({ username, FullName: "", saldo: 0 });
+                setUser({ username, FullName: "", balance: 0 });
             }
         }
         fetchUser();
@@ -41,7 +39,3 @@ export const useUser = () => {
     return ctx;
 };
 
-
-// export const useUser = () => {
-//   return useContext(UserContext);
-// };
