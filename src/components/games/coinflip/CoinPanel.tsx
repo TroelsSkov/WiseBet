@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { connection } from "./signalr";
+import { connection } from "../signalr";
 // import { useUser } from "../../../context/UserContext"; // Unused
 import type { CoinflipGameRequest, CoinflipSide } from "../../../types/games/coinflip";
 
