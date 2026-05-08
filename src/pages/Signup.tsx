@@ -5,8 +5,10 @@ import Input from "../components/form/Input";
 import wisebetLogo from "../assets/wisebet.png"
 import { useState } from "react";
 import { toast } from "react-toastify";
+import {useUser} from "../context/UserContext";
 
 function Signup() {
+    const { refreshUser } = useUser();
     const navigate = useNavigate();
     const notify = (message: string) => toast.success(message);
     const notifyError = (message: string) => toast.error(message);
@@ -18,13 +20,13 @@ function Signup() {
         e.preventDefault();
 
         apiService.post("/Api/Users/Auth/Register", { userName: username, password: password, fullName: fullName })
-            .then(({ error }) => {
+            .then(async ({ error }) => {
                 if (error) {
                     console.error("Signup failed:", error);
                     notifyError("Signup failed: " + error);
                     return;
                 }
-
+                await refreshUser();
                 // Login after account creation
                 handleLogin();
             });

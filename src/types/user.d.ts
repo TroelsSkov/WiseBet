@@ -12,7 +12,7 @@ interface UserRegisterRequest {
 interface User {
     username: string;
     FullName: string;
-    saldo: int;
+    balance: number;
 }
 
 export { UserLoginRequest, UserRegisterRequest, User };

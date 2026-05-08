@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { connection } from "./signalr";
-import { useUser } from "../../../context/UserContext";
+import { connection } from "../signalr";
+// import { useUser } from "../../../context/UserContext"; // Unused
 import type { CoinflipGameRequest, CoinflipSide } from "../../../types/games/coinflip";
+import { triggerSaldoEvent } from "../../../services/globalEvents";
 
 type Props = {
   betData: CoinflipGameRequest | null;
@@ -18,7 +19,10 @@ type CoinFlipResult = {
 
 
 export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
-  const user = useUser();
+  // const user = useUser();
+  const event = () => {
+    triggerSaldoEvent('saldo-event', {});
+  }
   const [rotation, setRotation] = useState(0);
   const [flipping, setFlipping] = useState(false);
   const [currentChoice, setCurrentChoice] = useState<CoinflipSide | null>(null);
@@ -40,18 +44,15 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
    * this useeffect is triggered when either, shouldFlip, betData or flipping has a changed state
    */
   useEffect(() => {
-    console.log("Måske?");
     if (!shouldFlip || flipping || !betData) return; //if not all states is changed the useeffect will just return
 
     setFlipping(true); //locking the flip, so the coin only flips once
     setCurrentChoice(betData.choice);
     connection.invoke(
       "PlayRound",
-      user?.id,
       betData.amount,
       betData.choice
     );
-    console.log("Yay!");
     
     timeoutRef.current = setTimeout(() => { onFlipped(); setFlipping(false); setCurrentChoice(null); }, 8000);
 
@@ -83,6 +84,10 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
       console.log("Win:", win);
       console.log("Winnings:", data.winnings);
       console.log("Message", data.message);
+
+      setTimeout(() => {
+        event();
+      }, 8000);
     };
 
     connection.on("UpdateClient", handleResult); //listens on UpdateClient from backend
