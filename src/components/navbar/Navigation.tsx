@@ -1,20 +1,46 @@
 import BalancePill from "./BalancePill"
 import PlayTimeCounter from "./PlayTimeCounter"
-import wisebetLogo from "../../assets/wisebet.png"
 import UserMenu from "./UserMenu"
 import DepositButton from "./DepositButton"
 import { Link } from "react-router-dom"
 import { useUser } from "../../context/UserContext"
 
+
+import { useEffect, useState } from "react"
+import { apiService } from "../../services/apiService"
+import { useEventListener } from "../../services/globalEvents"
+
+
 function Navigation() {
+    
     const { user } = useUser();
+    const [userSaldo, setUserSaldo] = useState(0);
+
+    useEffect(() => {
+        apiService.get("/Api/Users/me/UserAccount/saldo").then((res) => {
+            console.log(res.data);
+            setUserSaldo(res.data as number);
+        }).catch((err) => {
+            console.log("[Navigation] Unable to update balance: " + err);
+        })
+    }, [])
+
+    useEventListener('saldo-event', ({ }) => {
+        console.log("[Navigation] Saldo tried updating");
+        apiService.get("/Api/Users/me/UserAccount/saldo").then((res) => {
+            console.log(res.data);
+            setUserSaldo(res.data as number);
+        }).catch((err) => {
+            console.log("[Navigation] Unable to update balance: " + err);
+        })
+    })
 
     return (
         <>
             <div className="h-full flex items-center mx-8">
                 <div className="flex-1">
                     <Link to="/" className="flex items-center">
-                        <img src={wisebetLogo} className="h-12 w-12" alt="WiseBet logo" />
+                        <img src="/wisebet.png" className="h-10 w-10 rounded-xl" alt="WiseBet logo" />
                         <p className="ml-2 text-xl font-bold">WiseBet</p>
                     </Link>
                 </div>
@@ -24,7 +50,7 @@ function Navigation() {
                 </div>
 
                 <div className="flex flex-1 justify-end gap-4">
-                    {user && <BalancePill balance={user.balance} />}
+                    {user && <BalancePill balance={userSaldo} />}
                     {user && <DepositButton />}
                     {user ? (
                         <UserMenu user={user} />
@@ -33,6 +59,13 @@ function Navigation() {
                             Log ind
                         </Link>
                     )}
+                    {/* <BalancePill balance={userSaldo} />
+                    <DepositButton /> */}
+                    {/* <UserMenu user={{
+                        username: user?.username,
+                        FullName: user?.FullName,
+                        balance: user?.balance
+                    }} /> */}
                 </div>
             </div>
         </>

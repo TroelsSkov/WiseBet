@@ -10,8 +10,10 @@ import Signup from './pages/Signup'
 import { useEffect } from 'react'
 import { useApi } from './services/useApi'
 import { useUser } from './context/UserContext'
+import { toast } from 'react-toastify'
 
 function App() {
+  const notify = (message: string) => toast.error(message);
   const location = useLocation();
   const excludedPaths = ["/login", "/signup"];
   const { setUser } = useUser(); //new
@@ -25,6 +27,8 @@ function App() {
 
     if (error) {
       setUser(null); // session ugyldig, nulstil bruger
+      console.error("Session check failed:", error);
+      notify("Session expired! Please log in again.");
     }
   }, [location.pathname, error]);
 

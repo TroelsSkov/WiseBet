@@ -7,6 +7,7 @@ import type { User } from "../types/user";
 type UserContextType = {
     user: User | null;
     setUser: (user: User | null) => void;
+    refreshUser: () => Promise<void>;
 };
 
 
@@ -15,19 +16,24 @@ export const UserContext = createContext<UserContextType | null>(null);
 export function UserProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
 
-    useEffect(() => {
-        async function fetchUser() {
-            const { data, error } = await apiService.get<string>("/Api/Users/Auth");
-            if (!error && data) {
-                const username = data.split(": ")[1] ?? "Ukendt";
-                setUser({ username, FullName: "", balance: 0 });
-            }
+
+    async function refreshUser() {
+        const { data, error } = await apiService.get<string>("/Api/Users/Auth");
+        if (!error && data) {
+            const username = data.split(": ")[1] ?? "Ukendt";
+            setUser({ username, FullName: "", balance: 0 });
+        } else {
+            setUser(null);
         }
-        fetchUser();
+    }
+
+    useEffect(() => {
+        refreshUser();
+
     }, []);
 
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider value={{ user, setUser, refreshUser }}>
             {children}
         </UserContext.Provider>
     );
