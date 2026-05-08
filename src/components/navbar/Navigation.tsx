@@ -14,12 +14,12 @@ import { useEventListener } from "../../services/globalEvents"
 function Navigation() {
     
     const { user } = useUser();
-    const [userSaldo, setUserSaldo] = useState(0);
+    const [userBalance, setUserBalance] = useState(0);
 
     useEffect(() => {
         apiService.get("/Api/Users/me/UserAccount/saldo").then((res) => {
             console.log(res.data);
-            setUserSaldo(res.data as number);
+            setUserBalance(res.data as number);
         }).catch((err) => {
             console.log("[Navigation] Unable to update balance: " + err);
         })
@@ -29,7 +29,7 @@ function Navigation() {
         console.log("[Navigation] Saldo tried updating");
         apiService.get("/Api/Users/me/UserAccount/saldo").then((res) => {
             console.log(res.data);
-            setUserSaldo(res.data as number);
+            setUserBalance(res.data as number);
         }).catch((err) => {
             console.log("[Navigation] Unable to update balance: " + err);
         })
@@ -50,7 +50,7 @@ function Navigation() {
                 </div>
 
                 <div className="flex flex-1 justify-end gap-4">
-                    {user && <BalancePill balance={userSaldo} />}
+                    {user && <BalancePill balance={userBalance} />}
                     {user && <DepositButton />}
                     {user ? (
                         <UserMenu user={user} />
@@ -59,13 +59,6 @@ function Navigation() {
                             Log ind
                         </Link>
                     )}
-                    {/* <BalancePill balance={userSaldo} />
-                    <DepositButton /> */}
-                    {/* <UserMenu user={{
-                        username: user?.username,
-                        FullName: user?.FullName,
-                        balance: user?.balance
-                    }} /> */}
                 </div>
             </div>
         </>
