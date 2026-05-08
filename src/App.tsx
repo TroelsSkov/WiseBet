@@ -9,8 +9,10 @@ import Roulette from './pages/games/Roulette'
 import Signup from './pages/Signup'
 import { useEffect } from 'react'
 import { useApi } from './services/useApi'
+import { toast } from 'react-toastify'
 
 function App() {
+  const notify = (message: string) => toast.error(message);
   const location = useLocation();
   const excludedPaths = ["/login", "/signup"];
   const { error } = useApi<void>("/Api/Users/Auth");
@@ -22,6 +24,7 @@ function App() {
 
     if (error) {
       console.error("Session check failed:", error);
+      notify("Session expired! Please log in again.");
     }
   }, [location.pathname]);
 
