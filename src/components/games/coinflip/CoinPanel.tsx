@@ -18,6 +18,7 @@ type CoinFlipResult = {
 
 
 export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
+  // const user = useUser();
   const [rotation, setRotation] = useState(0);
   const [flipping, setFlipping] = useState(false);
   const [currentChoice, setCurrentChoice] = useState<CoinflipSide | null>(null);
@@ -43,7 +44,7 @@ export default function Coin({ betData, shouldFlip, onFlipped }: Props) {
 
     setFlipping(true); //locking the flip, so the coin only flips once
     setCurrentChoice(betData.choice);
-    connection.invoke( //send sends message to the server
+    connection.invoke(
       "PlayRound",
       // "435cdfcd-9cb4-4e1e-8f34-d3e8a71f29bc", //temp userId
       betData.amount,
