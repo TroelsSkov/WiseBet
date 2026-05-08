@@ -5,9 +5,33 @@ import UserMenu from "./UserMenu"
 // import Button from "../form/Button" // Unused
 import DepositButton from "./DepositButton"
 import { Link } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { apiService } from "../../services/apiService"
+import { useEventListener } from "../../services/globalEvents"
 
 
 function Navigation() {
+
+    const [userSaldo, setUserSaldo] = useState(0);
+
+    useEffect(() => {
+        apiService.get("/Api/Users/me/UserAccount/saldo").then((res) => {
+            console.log(res.data);
+            setUserSaldo(res.data as number);
+        }).catch((err) => {
+            console.log("[Navigation] Unable to update balance: " + err);
+        })
+    }, [])
+
+    useEventListener('saldo-event', ({ }) => {
+        apiService.get("/Api/Users/me/UserAccount/saldo").then((res) => {
+            console.log(res.data);
+            setUserSaldo(res.data as number);
+        }).catch((err) => {
+            console.log("[Navigation] Unable to update balance: " + err);
+        })
+    })
+
     return (
         <>
             <div className=" h-full flex items-center mx-8">
@@ -23,7 +47,7 @@ function Navigation() {
                 </div>
 
                 <div className="flex flex-1 justify-end gap-4">
-                    <BalancePill balance={1000} />
+                    <BalancePill balance={userSaldo} />
                     <DepositButton />
                     <UserMenu user={{
                         username: "TestUserName",
