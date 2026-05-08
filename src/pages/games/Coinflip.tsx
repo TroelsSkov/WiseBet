@@ -8,19 +8,6 @@ function Coinflip() {
   const [betData, setBetData] = useState<CoinflipGameRequest | null>(null);
   const [shouldFlip, setShouldFlip] = useState(false);
 
-  const event = () => {
-    triggerSaldoEvent('saldo-event', {});
-  }
-
-  useEffect(() => {
-    console.log("Tried updating saldo");
-    if (!shouldFlip)
-      setTimeout(() => {
-        event();
-      }, 8000);
-  }, [shouldFlip])
-
-
   return (
     <>
       <div className="flex justify-center items-center w-full h-screen scale-100">
